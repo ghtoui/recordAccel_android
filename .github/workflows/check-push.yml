@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           distribution: 'zulu'
-          java-version: '11'
+          java-version: '17'
           cache: 'gradle' # restore caches for gradle automatically
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
