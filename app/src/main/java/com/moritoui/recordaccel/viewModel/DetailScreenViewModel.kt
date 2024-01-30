@@ -6,4 +6,5 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DetailScreenViewModel @Inject constructor() : ViewModel() {
+    // TODO: 詳細画面のViewModel
 }
