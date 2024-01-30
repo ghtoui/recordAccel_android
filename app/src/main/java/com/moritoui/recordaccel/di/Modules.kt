@@ -16,13 +16,13 @@ object Modules {
 
     @Provides
     @Singleton
-    fun provideSensorManager(@ApplicationContext context: Context) : SensorManager {
+    fun provideSensorManager(@ApplicationContext context: Context): SensorManager {
         return context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     }
 
     @Provides
     @Singleton
-    fun provideMotionSensor(sensorManager: SensorManager) : MotionSensor {
+    fun provideMotionSensor(sensorManager: SensorManager): MotionSensor {
         return MotionSensor(sensorManager = sensorManager)
     }
 }
