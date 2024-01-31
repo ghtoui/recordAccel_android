@@ -3,6 +3,7 @@ package com.moritoui.recordaccel.di
 import android.content.Context
 import android.hardware.SensorManager
 import com.moritoui.recordaccel.model.MotionSensor
+import com.moritoui.recordaccel.model.TimeManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,7 +23,12 @@ object Modules {
 
     @Provides
     @Singleton
-    fun provideMotionSensor(sensorManager: SensorManager): MotionSensor {
-        return MotionSensor(sensorManager = sensorManager)
+    fun provideMotionSensor(
+        sensorManager: SensorManager,
+    ): MotionSensor {
+        return MotionSensor(
+            sensorManager = sensorManager,
+            timeManager = TimeManager()
+        )
     }
 }

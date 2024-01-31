@@ -29,6 +29,14 @@ class MainScreenViewModel @Inject constructor(
     private suspend fun checkAccDataList() {
         delay(1000)
         val accList = motionSensor.getAccDataList()
-        Log.d("sensor", accList.size.toString())
+        val it = accList.last()
+        Log.d("test",
+            "AccData(" +
+                    "accX = ${it.accX}.toFloat()," +
+                    "accY = ${it.accY}.toFloat()," +
+                    "accZ = ${it.accZ}.toFloat()," +
+                    "date = \"${it.date}\"" +
+                    "),"
+        )
     }
 }
