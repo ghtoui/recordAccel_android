@@ -4,6 +4,8 @@ import android.content.Context
 import android.hardware.SensorManager
 import com.moritoui.recordaccel.model.MotionSensor
 import com.moritoui.recordaccel.model.TimeManager
+import com.moritoui.recordaccel.repositories.SensorDataRepository
+import com.moritoui.recordaccel.repositories.SensorDataRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,5 +32,11 @@ object Modules {
             sensorManager = sensorManager,
             timeManager = TimeManager()
         )
+    }
+
+    @Provides
+    @Singleton
+    fun provideSensorDataRepository(motionSensor: MotionSensor): SensorDataRepository {
+        return SensorDataRepositoryImpl(motionSensor = motionSensor)
     }
 }
