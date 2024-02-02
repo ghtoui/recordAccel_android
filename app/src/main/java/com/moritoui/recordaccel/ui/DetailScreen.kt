@@ -159,7 +159,6 @@ fun getChartPath(
     }
 
     return PointF(x, y)
-
 }
 
 @Preview
