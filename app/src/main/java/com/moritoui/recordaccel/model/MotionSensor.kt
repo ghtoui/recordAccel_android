@@ -16,7 +16,7 @@ class MotionSensor @Inject constructor(
     private var accData: String = ""
 
     init {
-        accSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        accSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
         sensorManager.registerListener(this, accSensor, SensorManager.SENSOR_DELAY_NORMAL)
     }
 
