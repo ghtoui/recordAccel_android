@@ -36,6 +36,12 @@ object Modules {
 
     @Provides
     @Singleton
+    fun provideTimeManager(): TimeManager {
+        return TimeManager()
+    }
+
+    @Provides
+    @Singleton
     fun provideSensorDataRepository(motionSensor: MotionSensor): SensorDataRepository {
         return SensorDataRepositoryImpl(motionSensor = motionSensor)
     }

@@ -19,8 +19,8 @@ class SensorDataRepositoryImpl @Inject constructor(
 
     override fun updateAccDataList() {
         val accData = motionSensor.getAccDataList()
-        val splitNum = 100
-        accDataList = if (accData.size > splitNum) {
+        val splitNum = 0
+        accDataList = if (accData.size > splitNum && splitNum != 0) {
             accData.takeLast(splitNum)
         } else {
             accData
