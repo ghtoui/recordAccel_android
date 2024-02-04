@@ -6,6 +6,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import java.time.LocalDateTime
 import javax.inject.Inject
+import kotlin.math.pow
 
 class MotionSensor @Inject constructor(
     sensorManager: SensorManager,
@@ -14,6 +15,8 @@ class MotionSensor @Inject constructor(
     private var accSensor: Sensor? = null
     private var accDataList: MutableList<AccData> = mutableListOf()
     private var accData: String = ""
+    private val EXPONENT = 2.0
+    private val ROOT = 0.5
 
     init {
         accSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
@@ -27,12 +30,13 @@ class MotionSensor @Inject constructor(
         val x = event.values[0]
         val y = event.values[1]
         val z = event.values[2]
-        accData = "x: $x\ny: $y\nz: $z"
+        val resultAcc = (x.toDouble().pow(EXPONENT) +
+                y.toDouble().pow(EXPONENT) +
+                z.toDouble().pow(EXPONENT)).pow(ROOT)
+        accData = "resultAcc: $resultAcc"
         accDataList.add(
             AccData(
-                accX = x,
-                accY = y,
-                accZ = z,
+                resultAcc = resultAcc,
                 date = timeManager.dateToText(LocalDateTime.now())
             )
         )

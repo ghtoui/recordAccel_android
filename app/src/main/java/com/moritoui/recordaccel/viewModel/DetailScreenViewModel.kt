@@ -19,12 +19,8 @@ import javax.inject.Inject
 
 data class DetailScreenUiState(
     val accDataList: MutableList<AccData> = mutableListOf(),
-    val minXValue: Float = 0.0F,
-    val maxXValue: Float = 0.0F,
-    val minYValue: Float = 0.0F,
-    val maxYValue: Float = 0.0F,
-    val minZValue: Float = 0.0F,
-    val maxZValue: Float = 0.0F,
+    val minValue: Double = 0.0,
+    val maxValue: Double = 0.0,
     val selectedDateTime: String? = null,
     val dateList: MutableList<String> = mutableListOf(),
     val isLoading: Boolean
@@ -45,10 +41,6 @@ class DetailScreenViewModel @Inject constructor(
                 delay(1000)
                 updateIsLoading(false)
                 sensorDataRepository.updateAccDataList()
-//                val accDataList = when (_uiState.value.selectedDateTime) {
-//                    null -> sensorDataRepository.accDataList
-//                    else -> AccDataList.getAccDataList()
-//                }
                 val accDataList = AccDataList.getAccDataList() + sensorDataRepository.accDataList
                 if (!isLoadedDateList) {
                     isLoadedDateList = true
@@ -56,13 +48,12 @@ class DetailScreenViewModel @Inject constructor(
                     updateDateList(accDataList)
                 }
                 updateSensorUiState(accDataList)
-                Log.d("size", accDataList.size.toString())
                 // log確認用
-//                val it = sensorDataRepository.accDataList.last()
-//                Log.d(
-//                    "test",
-//                    "AccData(accX = ${it.accX}.toFloat(), accY = ${it.accY}.toFloat(), accZ = ${it.accZ}.toFloat(), date = \"${it.date}\"),"
-//                )
+                val it = sensorDataRepository.accDataList.last()
+                Log.d(
+                    "test",
+                    "AccData(resultAcc = ${it.resultAcc}, date = \"${it.date}\"),"
+                )
             }
         }
     }
@@ -70,39 +61,19 @@ class DetailScreenViewModel @Inject constructor(
     // 加速度データからx, y ,z の最小値・最大値を計算して、UiStateを更新
     private fun updateSensorUiState(accDataList: List<AccData>) {
         val accDataList = accDataDateFilter(accDataList).toMutableList()
-        var minXValue = accDataList.minOf { it.accX }
-        if (minXValue > _uiState.value.minXValue) {
-            minXValue = _uiState.value.minXValue
+        var minValue = accDataList.minOf { it.resultAcc }
+        if (minValue > _uiState.value.minValue) {
+            minValue = _uiState.value.minValue
         }
-        var maxXValue = accDataList.maxOf { it.accX }
-        if (maxXValue < _uiState.value.maxXValue) {
-            maxXValue = _uiState.value.maxXValue
-        }
-        var minYValue = accDataList.minOf { it.accY }
-        if (minYValue > _uiState.value.minYValue) {
-            minYValue = _uiState.value.minYValue
-        }
-        var maxYValue = accDataList.maxOf { it.accY }
-        if (maxYValue < _uiState.value.maxYValue) {
-            maxYValue = _uiState.value.maxYValue
-        }
-        var minZValue = accDataList.minOf { it.accZ }
-        if (minZValue > _uiState.value.minZValue) {
-            minZValue = _uiState.value.minZValue
-        }
-        var maxZValue = accDataList.maxOf { it.accZ }
-        if (maxZValue < _uiState.value.maxZValue) {
-            maxZValue = _uiState.value.maxZValue
+        var maxValue = accDataList.maxOf { it.resultAcc }
+        if (maxValue < _uiState.value.maxValue) {
+            maxValue = _uiState.value.maxValue
         }
         _uiState.update {
             it.copy(
                 accDataList = accDataList,
-                minXValue = minXValue,
-                maxXValue = maxXValue,
-                minYValue = minYValue,
-                maxYValue = maxYValue,
-                minZValue = minZValue,
-                maxZValue = maxZValue,
+                minValue = minValue,
+                maxValue = maxValue,
             )
         }
     }

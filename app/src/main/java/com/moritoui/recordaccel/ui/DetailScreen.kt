@@ -62,12 +62,8 @@ fun DetailScreen(
         ) {
             AccChartView(
                 accDataList = uiState.accDataList,
-                minXValue = uiState.minXValue,
-                maxXValue = uiState.maxXValue,
-                minYValue = uiState.minYValue,
-                maxYValue = uiState.maxYValue,
-                minZValue = uiState.minZValue,
-                maxZValue = uiState.maxZValue,
+                minValue = uiState.minValue,
+                maxValue = uiState.maxValue,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp)
@@ -96,12 +92,8 @@ fun DetailScreen(
 @Composable
 fun AccChartView(
     accDataList: MutableList<AccData>,
-    minXValue: Float,
-    maxXValue: Float,
-    minYValue: Float,
-    maxYValue: Float,
-    minZValue: Float,
-    maxZValue: Float,
+    minValue: Double,
+    maxValue: Double,
     modifier: Modifier = Modifier
 ) {
     if (accDataList.isEmpty()) {
@@ -112,39 +104,19 @@ fun AccChartView(
 //    val end = timeManager.stringToEpochTime(accDataList.last().date)
     val start = timeManager.textToDate(accDataList.first().date).withHour(12).withMinute(0).withSecond(0).atZone(
         ZoneId.systemDefault()).toInstant().toEpochMilli()
-    val end = timeManager.textToDate(accDataList.last().date).withHour(18).withMinute(59).withSecond(59).atZone(
+    val end = timeManager.textToDate(accDataList.last().date).withHour(23).withMinute(59).withSecond(59).atZone(
         ZoneId.systemDefault()).toInstant().toEpochMilli()
 
     Canvas(
         modifier = modifier
     ) {
-        val accXPath = Path()
-        val accYPath = Path()
-        val accZPath = Path()
+        val resultAccPath = Path()
         accDataList.forEachIndexed { index, accData ->
-            val accXPathXY = getChartPath(
+            val resultAccPathXY = getChartPath(
                 canvasSize = size,
-                value = accData.accX,
-                maxValue = maxXValue,
-                minValue = minXValue,
-                time = timeManager.stringToEpochTime(accData.date),
-                start = start,
-                end = end
-            )
-            val accYPathXY = getChartPath(
-                canvasSize = size,
-                value = accData.accY,
-                maxValue = maxYValue,
-                minValue = minYValue,
-                time = timeManager.stringToEpochTime(accData.date),
-                start = start,
-                end = end
-            )
-            val accZPathXY = getChartPath(
-                canvasSize = size,
-                value = accData.accZ,
-                maxValue = maxZValue,
-                minValue = minZValue,
+                value = accData.resultAcc,
+                maxValue = maxValue,
+                minValue = minValue,
                 time = timeManager.stringToEpochTime(accData.date),
                 start = start,
                 end = end
@@ -152,31 +124,17 @@ fun AccChartView(
 
             when (index) {
                 0 -> {
-                    accXPath.moveTo(accXPathXY.x, accXPathXY.y)
-                    accYPath.moveTo(accYPathXY.x, accYPathXY.y)
-                    accZPath.moveTo(accZPathXY.x, accZPathXY.y)
+                    resultAccPath.moveTo(resultAccPathXY.x, resultAccPathXY.y)
                 }
                 else -> {
-                    accXPath.lineTo(accXPathXY.x, accXPathXY.y)
-                    accYPath.lineTo(accYPathXY.x, accYPathXY.y)
-                    accZPath.lineTo(accZPathXY.x, accZPathXY.y)
+                    resultAccPath.lineTo(resultAccPathXY.x, resultAccPathXY.y)
                 }
             }
         }
 
         drawPath(
-            path = accXPath,
-            color = Color.Red,
-            style = Stroke(width = 8f)
-        )
-        drawPath(
-            path = accYPath,
-            color = Color.Green,
-            style = Stroke(width = 8f)
-        )
-        drawPath(
-            path = accZPath,
-            color = Color.Blue,
+            path = resultAccPath,
+            color = Color.Black,
             style = Stroke(width = 8f)
         )
     }
@@ -184,9 +142,9 @@ fun AccChartView(
 
 fun getChartPath(
     canvasSize: Size,
-    value: Float,
-    maxValue: Float,
-    minValue: Float,
+    value: Double,
+    maxValue: Double,
+    minValue: Double,
     time: Long,
     start: Long,
     end: Long
@@ -204,7 +162,7 @@ fun getChartPath(
         y = height * value
     }
 
-    return PointF(x, y)
+    return PointF(x, y.toFloat())
 }
 
 @Composable
@@ -294,12 +252,8 @@ fun DetailScreenPreview() {
             Column {
                 AccChartView(
                     accDataList = accDataList.toMutableList(),
-                    minXValue = accDataList.minOf { it.accX },
-                    maxXValue = accDataList.maxOf { it.accX },
-                    minYValue = accDataList.minOf { it.accY },
-                    maxYValue = accDataList.maxOf { it.accY },
-                    minZValue = accDataList.minOf { it.accZ },
-                    maxZValue = accDataList.maxOf { it.accZ },
+                    minValue = accDataList.minOf { it.resultAcc },
+                    maxValue = accDataList.maxOf { it.resultAcc },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height((LocalConfiguration.current.screenHeightDp / 3).dp)
