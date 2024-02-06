@@ -370,4 +370,3 @@ fun DetailScreenPreviewLight() {
 fun DetailScreenPreviewDark() {
     DetailScreenPreview()
 }
-

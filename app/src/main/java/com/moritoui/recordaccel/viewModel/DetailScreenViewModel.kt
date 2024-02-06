@@ -139,7 +139,7 @@ class DetailScreenViewModel @Inject constructor(
     // endは23:59:59を超えないようjに調整
     private fun calcXAxis(): Pair<Long, Long> {
         val now = LocalDateTime.now()
-        val baseDateTime: LocalDateTime = if (_uiState.value.selectedDateTime == null)  {
+        val baseDateTime: LocalDateTime = if (_uiState.value.selectedDateTime == null) {
             now
         } else {
             timeManager.textToDate(_uiState.value.selectedDateTime + " ${"${now.hour}".padStart(2, '0')}:${"${now.minute}".padStart(2, '0')}:${"${now.second}".padStart(2, '0')}")
@@ -156,7 +156,7 @@ class DetailScreenViewModel @Inject constructor(
             }
             TimeTerm.Hour -> baseDateTime.withMinute(0)
         }
-        val xAxisEnd = when(_uiState.value.selectTimeTerm) {
+        val xAxisEnd = when (_uiState.value.selectTimeTerm) {
             TimeTerm.Day -> baseDateTime.withHour(23).withMinute(59).withSecond(59)
             TimeTerm.HalfDay -> when (baseDateTime.hour) {
                 in 18..24 -> baseDateTime.withHour(23).withMinute(59).withSecond(59)
