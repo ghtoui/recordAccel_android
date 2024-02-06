@@ -496,7 +496,27 @@ object AccDataList {
             AccData(resultAcc = 0.0, date = "2024-02-04 16:30:45"),
             AccData(resultAcc = 0.0, date = "2024-02-04 16:30:46"),
             AccData(resultAcc = 0.0, date = "2024-02-04 16:30:47"),
-            AccData(resultAcc = 0.0, date = "2024-02-04 16:30:48"),
+            AccData(resultAcc = 5.0, date = "2024-02-04 16:30:48"),
+            AccData(resultAcc = 0.0, date = "2024-02-04 17:30:27"),
+            AccData(resultAcc = 1.253000020980835, date = "2024-02-04 17:30:29"),
+            AccData(resultAcc = 3.220625162124634, date = "2024-02-04 17:30:30"),
+            AccData(resultAcc = 6.78587532043457, date = "2024-02-04 17:30:31"),
+            AccData(resultAcc = 6.764625549316406, date = "2024-02-04 17:30:32"),
+            AccData(resultAcc = 5.7038750648498535, date = "2024-02-04 17:30:33"),
+            AccData(resultAcc = 0.0, date = "2024-02-04 17:30:34"),
+            AccData(resultAcc = 0.0, date = "2024-02-04 17:30:35"),
+            AccData(resultAcc = 0.0, date = "2024-02-04 17:30:36"),
+            AccData(resultAcc = 3.715250253677368, date = "2024-02-04 17:30:37"),
+            AccData(resultAcc = 2.5366251468658447, date = "2024-02-04 17:30:38"),
+            AccData(resultAcc = 7.1216254234313965, date = "2024-02-04 17:30:39"),
+            AccData(resultAcc = 1.6238750219345093, date = "2024-02-04 17:30:41"),
+            AccData(resultAcc = 6.158875465393066, date = "2024-02-04 17:30:42"),
+            AccData(resultAcc = 5.639000415802002, date = "2024-02-04 17:30:43"),
+            AccData(resultAcc = 0.0, date = "2024-02-04 17:30:44"),
+            AccData(resultAcc = 0.0, date = "2024-02-04 17:30:45"),
+            AccData(resultAcc = 0.0, date = "2024-02-04 17:30:46"),
+            AccData(resultAcc = 0.0, date = "2024-02-04 17:30:47"),
+            AccData(resultAcc = 5.0, date = "2024-02-04 17:30:48")
         )
     }
 }

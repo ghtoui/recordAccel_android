@@ -1,13 +1,15 @@
 package com.moritoui.recordaccel.viewModel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moritoui.recordaccel.model.AccData
 import com.moritoui.recordaccel.model.AccDataList
 import com.moritoui.recordaccel.model.TimeManager
+import com.moritoui.recordaccel.model.TimeTerm
 import com.moritoui.recordaccel.repositories.SensorDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +25,10 @@ data class DetailScreenUiState(
     val maxValue: Double = 0.0,
     val selectedDateTime: String? = null,
     val dateList: MutableList<String> = mutableListOf(),
-    val isLoading: Boolean
+    val isLoading: Boolean,
+    val selectTimeTerm: TimeTerm = TimeTerm.Day,
+    val xStart: Long = 0,
+    val xEnd: Long = 0
 )
 
 @HiltViewModel
@@ -36,6 +41,8 @@ class DetailScreenViewModel @Inject constructor(
     private var isLoadedDateList = false
 
     init {
+        updateXAxis()
+        // 1秒毎に加速度を収集する
         viewModelScope.launch {
             while (true) {
                 delay(1000)
@@ -46,14 +53,23 @@ class DetailScreenViewModel @Inject constructor(
                     isLoadedDateList = true
                     // 保存されているものだけ渡す
                     updateDateList(accDataList)
+                    selectedDateTime(_uiState.value.dateList.last())
                 }
                 updateSensorUiState(accDataList)
                 // log確認用
-                val it = sensorDataRepository.accDataList.last()
-                Log.d(
-                    "test",
-                    "AccData(resultAcc = ${it.resultAcc}, date = \"${it.date}\"),"
-                )
+//                val it = sensorDataRepository.accDataList.last()
+//                Log.d(
+//                    "test",
+//                    "AccData(resultAcc = ${it.resultAcc}, date = \"${it.date}\"),"
+//                )
+            }
+        }
+
+        // 1分毎に加速度をまとめる
+        viewModelScope.launch {
+            while (true) {
+                delay(1000 * 30)
+                sensorDataRepository.sumlizeAccList()
             }
         }
     }
@@ -105,6 +121,12 @@ class DetailScreenViewModel @Inject constructor(
         }
     }
 
+    // 要素が選択された時に呼び出すものをまとめる
+    private fun selectReload() {
+        updateIsLoading(true)
+        updateXAxis()
+    }
+
     private fun updateIsLoading(isLoading: Boolean) {
         _uiState.update {
             it.copy(
@@ -113,15 +135,76 @@ class DetailScreenViewModel @Inject constructor(
         }
     }
 
+    // startが負の値にならないように調整
+    // endは23:59:59を超えないようjに調整
+    private fun calcXAxis(): Pair<Long, Long> {
+        val now = LocalDateTime.now()
+        val baseDateTime: LocalDateTime = if (_uiState.value.selectedDateTime == null)  {
+            now
+        } else {
+            timeManager.textToDate(_uiState.value.selectedDateTime + " ${"${now.hour}".padStart(2, '0')}:${"${now.minute}".padStart(2, '0')}:${"${now.second}".padStart(2, '0')}")
+        }
+        val xAxisStart = when (_uiState.value.selectTimeTerm) {
+            TimeTerm.Day -> baseDateTime.withHour(0).withMinute(0).withSecond(0)
+            TimeTerm.HalfDay -> when (baseDateTime.hour) {
+                in 0..5 -> baseDateTime.withHour(0)
+                else -> baseDateTime.withHour(baseDateTime.hour - 6)
+            }
+            TimeTerm.ThreeHours -> when (baseDateTime.hour) {
+                in 0..2 -> baseDateTime.withHour(0)
+                else -> baseDateTime.withHour(baseDateTime.hour - 3)
+            }
+            TimeTerm.Hour -> baseDateTime.withMinute(0)
+        }
+        val xAxisEnd = when(_uiState.value.selectTimeTerm) {
+            TimeTerm.Day -> baseDateTime.withHour(23).withMinute(59).withSecond(59)
+            TimeTerm.HalfDay -> when (baseDateTime.hour) {
+                in 18..24 -> baseDateTime.withHour(23).withMinute(59).withSecond(59)
+                else -> baseDateTime.withHour(baseDateTime.hour + 6)
+            }
+            TimeTerm.ThreeHours -> when (baseDateTime.hour) {
+                in 21..24 -> baseDateTime.withHour(23).withMinute(59).withSecond(59)
+                else -> baseDateTime.withHour(baseDateTime.hour + 3)
+            }
+            TimeTerm.Hour -> baseDateTime.withMinute(59)
+        }
+
+        val start = xAxisStart.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val end = xAxisEnd.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+
+        return Pair(start, end)
+    }
+
+    private fun updateXAxis() {
+        val xAxis = calcXAxis()
+        _uiState.update {
+            it.copy(
+                xStart = xAxis.first,
+                xEnd = xAxis.second
+            )
+        }
+    }
+
+    // 日付が選択されたら、min, maxのスケールを初期化する
+// その日によって違うから
     fun selectedDateTime(selectedDateTime: String) {
         _uiState.update {
             it.copy(
-                selectedDateTime = when (selectedDateTime) {
-                    it.selectedDateTime -> null
-                    else -> selectedDateTime
-                }
+                selectedDateTime = selectedDateTime,
+                minValue = 0.0,
+                maxValue = 0.0,
+                selectTimeTerm = TimeTerm.Day
             )
         }
-        updateIsLoading(true)
+        selectReload()
+    }
+
+    fun selectTimeTerm(selectTimeTerm: TimeTerm) {
+        _uiState.update {
+            it.copy(
+                selectTimeTerm = selectTimeTerm
+            )
+        }
+        selectReload()
     }
 }

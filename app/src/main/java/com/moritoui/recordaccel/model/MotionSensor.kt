@@ -4,6 +4,7 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.util.Log
 import java.time.LocalDateTime
 import javax.inject.Inject
 import kotlin.math.pow
@@ -19,7 +20,8 @@ class MotionSensor @Inject constructor(
     private val ROOT = 0.5
 
     init {
-        accSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
+//        accSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
+        accSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)
         sensorManager.registerListener(this, accSensor, SensorManager.SENSOR_DELAY_NORMAL)
     }
 
@@ -30,10 +32,9 @@ class MotionSensor @Inject constructor(
         val x = event.values[0]
         val y = event.values[1]
         val z = event.values[2]
-        val resultAcc = (x.toDouble().pow(EXPONENT) +
-                y.toDouble().pow(EXPONENT) +
-                z.toDouble().pow(EXPONENT)).pow(ROOT)
-        accData = "resultAcc: $resultAcc"
+
+        // 三軸加速度の合成
+        val resultAcc = (x.toDouble().pow(EXPONENT) + y.toDouble().pow(EXPONENT) + z.toDouble().pow(EXPONENT)).pow(ROOT)
         accDataList.add(
             AccData(
                 resultAcc = resultAcc,
@@ -52,5 +53,9 @@ class MotionSensor @Inject constructor(
 
     fun getAccDataList(): MutableList<AccData> {
         return accDataList
+    }
+
+    fun clearAccDataList() {
+        accDataList = mutableListOf()
     }
 }

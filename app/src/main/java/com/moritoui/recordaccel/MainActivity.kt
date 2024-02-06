@@ -5,6 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.moritoui.recordaccel.navigation.Navigation
 import com.moritoui.recordaccel.ui.theme.RecordAccelTheme
@@ -18,9 +20,13 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             RecordAccelTheme {
-                Navigation(
-                    modifier = Modifier.safeDrawingPadding()
-                )
+                Surface(
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    Navigation(
+                        modifier = Modifier.safeDrawingPadding()
+                    )
+                }
             }
         }
     }
