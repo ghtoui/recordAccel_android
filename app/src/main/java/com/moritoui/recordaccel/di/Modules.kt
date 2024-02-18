@@ -3,6 +3,9 @@ package com.moritoui.recordaccel.di
 import android.content.Context
 import android.hardware.SensorManager
 import com.moritoui.recordaccel.model.MotionSensor
+import com.moritoui.recordaccel.model.TimeManager
+import com.moritoui.recordaccel.repositories.SensorDataRepository
+import com.moritoui.recordaccel.repositories.SensorDataRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,7 +25,24 @@ object Modules {
 
     @Provides
     @Singleton
-    fun provideMotionSensor(sensorManager: SensorManager): MotionSensor {
-        return MotionSensor(sensorManager = sensorManager)
+    fun provideMotionSensor(
+        sensorManager: SensorManager,
+    ): MotionSensor {
+        return MotionSensor(
+            sensorManager = sensorManager,
+            timeManager = TimeManager()
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideTimeManager(): TimeManager {
+        return TimeManager()
+    }
+
+    @Provides
+    @Singleton
+    fun provideSensorDataRepository(motionSensor: MotionSensor): SensorDataRepository {
+        return SensorDataRepositoryImpl(motionSensor = motionSensor)
     }
 }

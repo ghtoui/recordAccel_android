@@ -19,10 +19,11 @@ sealed class Screen(
 
 @Composable
 fun Navigation(
+    modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
 ) {
     NavHost(
-        modifier = Modifier,
+        modifier = modifier,
         navController = navController,
         startDestination = Screen.MainScreen.route
     ) {
