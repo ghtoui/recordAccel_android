@@ -1,5 +1,6 @@
 package com.moritoui.recordaccel.viewModel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moritoui.recordaccel.model.AccData
@@ -60,7 +61,7 @@ class DetailScreenViewModel @Inject constructor(
 //                val it = sensorDataRepository.accDataList.last()
 //                Log.d(
 //                    "test",
-//                    "AccData(resultAcc = ${it.resultAcc}, date = \"${it.date}\"),"
+//                    "AccData(resultAcc = ${it.resultAcc}, date = ZonedDateTime.parse(\"${timeManager.dateToISOText(it.date)}\")),"
 //                )
             }
         }
@@ -106,7 +107,7 @@ class DetailScreenViewModel @Inject constructor(
     // 年月日でグループ化する
     private fun extractDateList(accDataList: List<AccData>): MutableList<String> {
         return accDataList.groupBy {
-            timeManager.textToDate(it.date).format(DateTimeFormatter.ISO_LOCAL_DATE)
+            it.date.format(DateTimeFormatter.ISO_LOCAL_DATE)
         }.keys.toMutableList()
     }
 
@@ -115,8 +116,7 @@ class DetailScreenViewModel @Inject constructor(
         return when (_uiState.value.selectedDateTime) {
             null -> accDataList
             else -> accDataList.filter {
-                timeManager.textToDate(it.date)
-                    .format(DateTimeFormatter.ISO_LOCAL_DATE) == _uiState.value.selectedDateTime
+                it.date.format(DateTimeFormatter.ISO_LOCAL_DATE) == _uiState.value.selectedDateTime
             }
         }
     }

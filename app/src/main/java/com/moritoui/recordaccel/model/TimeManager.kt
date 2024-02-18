@@ -1,7 +1,9 @@
 package com.moritoui.recordaccel.model
 
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 class TimeManager {
@@ -10,14 +12,8 @@ class TimeManager {
         return LocalDateTime.parse(dateText, customDateFormatter)
     }
 
-    fun dateToText(datetime: LocalDateTime): String {
-        return datetime.format(customDateFormatter)
-    }
-
-    fun stringToEpochTime(stringDateTime: String): Long {
-        val datetime = textToDate(stringDateTime)
-        val instant = datetime.atZone(ZoneId.systemDefault()).toInstant()
-        return instant.toEpochMilli()
+    fun dateToISOText(datetime: ZonedDateTime): String {
+        return "${datetime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)}Z"
     }
 
     fun diffEpochTime(targetEpochTime: Long, baseEpochTime: Long): String {

@@ -3,6 +3,8 @@ package com.moritoui.recordaccel.ui
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.graphics.PointF
+import android.util.Log
+import android.view.MotionEvent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -34,11 +36,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PointMode
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
@@ -54,9 +58,6 @@ import com.moritoui.recordaccel.model.TimeManager
 import com.moritoui.recordaccel.model.TimeTerm
 import com.moritoui.recordaccel.ui.theme.RecordAccelTheme
 import com.moritoui.recordaccel.viewModel.DetailScreenViewModel
-import java.time.format.DateTimeFormatter
-
-private val timeManager = TimeManager()
 
 @Composable
 fun DetailScreen(
@@ -107,6 +108,7 @@ fun DetailScreen(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun AccChartView(
     accDataList: MutableList<AccData>,
@@ -122,16 +124,25 @@ fun AccChartView(
     val points: MutableList<Offset> = mutableListOf()
     val zeroPoints: MutableList<Offset> = mutableListOf()
 
-//    val start = timeManager.stringToEpochTime(accDataList.first().date)
-//    val end = timeManager.stringToEpochTime(accDataList.last().date)
-//    val start = timeManager.textToDate(accDataList.first().date).withHour(0).withMinute(0).withSecond(0).atZone(
-//        ZoneId.systemDefault()).toInstant().toEpochMilli()
-//    val end = timeManager.textToDate(accDataList.last().date).withHour(23).withMinute(59).withSecond(59).atZone(
-//        ZoneId.systemDefault()).toInstant().toEpochMilli()
     val textMeasurer = rememberTextMeasurer()
 
     Canvas(
         modifier = modifier
+            .pointerInteropFilter { motionEvent : MotionEvent ->
+                when (motionEvent.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        Log.d("action", "tap")
+                    }
+                    MotionEvent.ACTION_MOVE -> {
+                        Log.d("action", "move")
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        Log.d("action", "up")
+                    }
+                    else -> return@pointerInteropFilter  false
+                }
+                true
+            }
     ) {
         val resultAccPath = Path()
         accDataList.forEachIndexed { index, accData ->
@@ -141,7 +152,7 @@ fun AccChartView(
                 value = accData.resultAcc,
                 maxValue = maxValue,
                 minValue = minValue,
-                time = timeManager.stringToEpochTime(accData.date),
+                time = accData.date.toInstant().toEpochMilli(),
                 xAxisStart = xAxisStart,
                 xAxisEnd = xAxisEnd
             )
@@ -317,32 +328,36 @@ fun DateTimeRangeChangeButton(
 fun DetailScreenPreview() {
     val timeManager = TimeManager()
     var accDataList = AccDataList.getAccDataList()
-    val dateList = accDataList.groupBy { timeManager.textToDate(it.date).format(DateTimeFormatter.ISO_LOCAL_DATE) }.keys.toList()
+    val dateList = accDataList.groupBy { it.date }.keys.toList()
     val selectDate = dateList.last()
     var selectTimeTerm: TimeTerm = TimeTerm.Day
+    val xAxisStart = accDataList.first().date.withHour(0).withMinute(0).withSecond(0).toInstant().toEpochMilli()
+    val xAxisEnd = accDataList.last().date.withHour(23).withMinute(59).withSecond(59).toInstant().toEpochMilli()
     accDataList = accDataList.filter {
-        timeManager.textToDate(it.date).format(DateTimeFormatter.ISO_LOCAL_DATE) == selectDate
+        it.date == selectDate
     }
     RecordAccelTheme {
         Surface(
             color = MaterialTheme.colorScheme.background
         ) {
             Column {
-                DateTimeRangeChangeButton(
-                    selectTimeTerm = selectTimeTerm,
-                    onClickTerm = { selectTimeTerm = it },
-                    modifier = Modifier
-                        .height(50.dp)
-                )
-//                AccChartView(
-//                    accDataList = accDataList.toMutableList(),
-//                    minValue = accDataList.minOf { it.resultAcc },
-//                    maxValue = accDataList.maxOf { it.resultAcc },
+//                DateTimeRangeChangeButton(
+//                    selectTimeTerm = selectTimeTerm,
+//                    onClickTerm = { selectTimeTerm = it },
 //                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .height((LocalConfiguration.current.screenHeightDp / 3).dp)
-//                        .padding(16.dp)
+//                        .height(50.dp)
 //                )
+                AccChartView(
+                    accDataList = accDataList.toMutableList(),
+                    minValue = accDataList.minOf { it.resultAcc },
+                    maxValue = accDataList.maxOf { it.resultAcc },
+                    xAxisStart = xAxisStart,
+                    xAxisEnd = xAxisEnd,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height((LocalConfiguration.current.screenHeightDp / 3).dp)
+                        .padding(16.dp)
+                )
 //                DateList(
 //                    dateList = dateList.reversed().toMutableList(),
 //                    onClickDateTimeElement = { selectDate = it },
