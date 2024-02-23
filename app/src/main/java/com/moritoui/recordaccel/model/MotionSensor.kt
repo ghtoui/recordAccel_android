@@ -4,9 +4,7 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.util.Log
 import java.time.LocalDateTime
-import java.time.ZonedDateTime
 import javax.inject.Inject
 import kotlin.math.pow
 
@@ -39,7 +37,7 @@ class MotionSensor @Inject constructor(
         accDataList.add(
             AccData(
                 resultAcc = resultAcc,
-                date = ZonedDateTime.now()
+                date = LocalDateTime.now()
             )
         )
     }

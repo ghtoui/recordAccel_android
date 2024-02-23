@@ -59,6 +59,8 @@ import com.moritoui.recordaccel.model.TimeTerm
 import com.moritoui.recordaccel.ui.theme.RecordAccelTheme
 import com.moritoui.recordaccel.viewModel.DetailScreenViewModel
 
+private val timeManager: TimeManager = TimeManager()
+
 @Composable
 fun DetailScreen(
     viewModel: DetailScreenViewModel = hiltViewModel()
@@ -100,7 +102,7 @@ fun DetailScreen(
             dateList = uiState.dateList,
             onClickDateTimeElement = remember {
                 {
-                    viewModel.selectedDateTime(it)
+                    viewModel.updateSelectedDatetime(it)
                 }
             },
             modifier = Modifier.weight(1f)
@@ -152,7 +154,7 @@ fun AccChartView(
                 value = accData.resultAcc,
                 maxValue = maxValue,
                 minValue = minValue,
-                time = accData.date.toInstant().toEpochMilli(),
+                time = timeManager.dateToEpochTime(accData.date),
                 xAxisStart = xAxisStart,
                 xAxisEnd = xAxisEnd
             )
@@ -331,8 +333,8 @@ fun DetailScreenPreview() {
     val dateList = accDataList.groupBy { it.date }.keys.toList()
     val selectDate = dateList.last()
     var selectTimeTerm: TimeTerm = TimeTerm.Day
-    val xAxisStart = accDataList.first().date.withHour(0).withMinute(0).withSecond(0).toInstant().toEpochMilli()
-    val xAxisEnd = accDataList.last().date.withHour(23).withMinute(59).withSecond(59).toInstant().toEpochMilli()
+    val xAxisStart = timeManager.dateToEpochTime(accDataList.first().date.withHour(0).withMinute(0).withSecond(0))
+    val xAxisEnd = timeManager.dateToEpochTime(accDataList.last().date.withHour(23).withMinute(59).withSecond(59))
     accDataList = accDataList.filter {
         it.date == selectDate
     }

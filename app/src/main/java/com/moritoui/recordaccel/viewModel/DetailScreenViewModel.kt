@@ -1,23 +1,27 @@
 package com.moritoui.recordaccel.viewModel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moritoui.recordaccel.model.AccData
-import com.moritoui.recordaccel.model.AccDataList
 import com.moritoui.recordaccel.model.TimeManager
 import com.moritoui.recordaccel.model.TimeTerm
-import com.moritoui.recordaccel.repositories.SensorDataRepository
+import com.moritoui.recordaccel.usecases.GetAccDataListUseCase
+import com.moritoui.recordaccel.usecases.GetAccDateListUseCase
+import com.moritoui.recordaccel.usecases.GetApiAccelDataUseCase
+import com.moritoui.recordaccel.usecases.SumlizeAccDataUseCase
+import com.moritoui.recordaccel.usecases.UpdateAccDataListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 import javax.inject.Inject
 
 data class DetailScreenUiState(
@@ -34,12 +38,18 @@ data class DetailScreenUiState(
 
 @HiltViewModel
 class DetailScreenViewModel @Inject constructor(
-    private val sensorDataRepository: SensorDataRepository,
-    private val timeManager: TimeManager
+    private val timeManager: TimeManager,
+    private val getAccDataListUseCase: GetAccDataListUseCase,
+    private val updateAccDataListUseCase: UpdateAccDataListUseCase,
+    private val getDateListUseCase: GetAccDateListUseCase,
+    private val getApiAccelDataUseCase: GetApiAccelDataUseCase,
+    private val sumlizeAccDataUseCase: SumlizeAccDataUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DetailScreenUiState(isLoading = true))
+    private val mutex = Mutex()
     val uiState: StateFlow<DetailScreenUiState> = _uiState.asStateFlow()
     private var isLoadedDateList = false
+    private var accDataList: MutableList<AccData> = getAccDataListUseCase(selectedDate = _uiState.value.selectedDateTime)
 
     init {
         updateXAxis()
@@ -48,29 +58,26 @@ class DetailScreenViewModel @Inject constructor(
             while (true) {
                 delay(1000)
                 updateIsLoading(false)
-                sensorDataRepository.updateAccDataList()
-                val accDataList = AccDataList.getAccDataList() + sensorDataRepository.accDataList
+                updateAccDataListUseCase()
+                accDataList = getAccDataListUseCase(selectedDate = _uiState.value.selectedDateTime)
                 if (!isLoadedDateList) {
                     isLoadedDateList = true
                     // 保存されているものだけ渡す
-                    updateDateList(accDataList)
-                    selectedDateTime(_uiState.value.dateList.last())
+                    val getAsyncDateList = async { getDateListUseCase() }
+                    val accDateList = getAsyncDateList.await()
+                    updateSelectedDatetime(accDateList.last())
+                    updateDateList(accDateList)
                 }
                 updateSensorUiState(accDataList)
-                // log確認用
-//                val it = sensorDataRepository.accDataList.last()
-//                Log.d(
-//                    "test",
-//                    "AccData(resultAcc = ${it.resultAcc}, date = ZonedDateTime.parse(\"${timeManager.dateToISOText(it.date)}\")),"
-//                )
             }
         }
 
-        // 1分毎に加速度をまとめる
+        // 30秒毎に加速度をまとめる
+        // 指定数ごとにpushする
         viewModelScope.launch {
             while (true) {
                 delay(1000 * 30)
-                sensorDataRepository.sumlizeAccList()
+                sumlizeAccDataUseCase(pushCount = 3)
             }
         }
     }
@@ -78,6 +85,9 @@ class DetailScreenViewModel @Inject constructor(
     // 加速度データからx, y ,z の最小値・最大値を計算して、UiStateを更新
     private fun updateSensorUiState(accDataList: List<AccData>) {
         val accDataList = accDataDateFilter(accDataList).toMutableList()
+        if (accDataList.isEmpty()) {
+            return
+        }
         var minValue = accDataList.minOf { it.resultAcc }
         if (minValue > _uiState.value.minValue) {
             minValue = _uiState.value.minValue
@@ -96,19 +106,12 @@ class DetailScreenViewModel @Inject constructor(
     }
 
     // 保存されている加速度の年月日を取得
-    private fun updateDateList(accDataList: List<AccData>) {
+    private fun updateDateList(accDataList: MutableList<String>) {
         _uiState.update {
             it.copy(
-                dateList = extractDateList(accDataList)
+                dateList = accDataList
             )
         }
-    }
-
-    // 年月日でグループ化する
-    private fun extractDateList(accDataList: List<AccData>): MutableList<String> {
-        return accDataList.groupBy {
-            it.date.format(DateTimeFormatter.ISO_LOCAL_DATE)
-        }.keys.toMutableList()
     }
 
     // 加速度データから選択されている年月日だけのものを抜き出す
@@ -186,8 +189,8 @@ class DetailScreenViewModel @Inject constructor(
     }
 
     // 日付が選択されたら、min, maxのスケールを初期化する
-// その日によって違うから
-    fun selectedDateTime(selectedDateTime: String) {
+    // その日によって違うから
+    fun updateSelectedDatetime(selectedDateTime: String) {
         _uiState.update {
             it.copy(
                 selectedDateTime = selectedDateTime,
@@ -195,6 +198,10 @@ class DetailScreenViewModel @Inject constructor(
                 maxValue = 0.0,
                 selectTimeTerm = TimeTerm.Day
             )
+        }
+        viewModelScope.launch {
+            val getAsyncApiAccelData = async { getApiAccelDataUseCase(selectedDateTime) }
+            getAsyncApiAccelData.await()
         }
         selectReload()
     }
