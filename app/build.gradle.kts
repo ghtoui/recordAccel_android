@@ -1,12 +1,11 @@
-import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
-
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
     id("kotlinx-serialization")
-    kotlin("kapt")
     id("com.google.dagger.hilt.android")
+    id("com.google.devtools.ksp")
+    kotlin("kapt")
 }
 
 android {
@@ -91,11 +90,20 @@ dependencies {
     kapt("com.google.dagger:hilt-android-compiler:$hilt_version")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
-    // retrofit
     // Retrofit
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    // Retrofit with Scalar Converter
-    implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
+    val retrofitVersion = "2.9.0"
+    implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
+    implementation("com.squareup.retrofit2:converter-moshi:$retrofitVersion")
+
+    // Moshi
+    val moshiVersion = "1.13.0"
+    implementation("com.squareup.moshi:moshi:$moshiVersion")
+    ksp("com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion")
+
+    // Okhttp
+    val okHttpVersion = "4.12.0"
+    implementation("com.squareup.okhttp3:okhttp:$okHttpVersion")
+    implementation("com.squareup.okhttp3:logging-interceptor:$okHttpVersion")
 }
 
 kapt {
