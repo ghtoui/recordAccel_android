@@ -104,6 +104,10 @@ dependencies {
     val okHttpVersion = "4.12.0"
     implementation("com.squareup.okhttp3:okhttp:$okHttpVersion")
     implementation("com.squareup.okhttp3:logging-interceptor:$okHttpVersion")
+
+    // dataStore
+    val datastore_version = "1.0.0"
+    implementation("androidx.datastore:datastore-preferences:$datastore_version")
 }
 
 kapt {

@@ -21,6 +21,11 @@ interface AccelApiService {
         @Query("date") date: String
     ): Response<List<AccDataJsonData>>
 
+    @GET("/checkUser")
+    suspend fun searchUser(
+        @Query("userId") userId: String
+    ): Response<Boolean>
+
     @POST("/")
     suspend fun postAccData(
         @Body body:  List<PostAccData>

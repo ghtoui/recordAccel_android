@@ -1,6 +1,6 @@
-
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +13,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -69,6 +71,8 @@ fun MainScreen(
         onDismissClick = viewModel::closeDialog
     )
     OtherUserRegisterDialog(
+        isLoading = uiState.isRegisterLoading,
+        isSearchUserError = uiState.isSearchUserError,
         isOpenDiagram = uiState.isOpenOtherRegisterDialog,
         isRegister = uiState.isRegisterUser,
         idInputText = uiState.idInputText,
@@ -79,7 +83,7 @@ fun MainScreen(
         nameTextFieldChanged = remember {
             { viewModel.onChangedOtherNameTextField(it) }
         },
-        onConfirmClick = { /*TODO*/ },
+        onConfirmClick = { viewModel.registerUser(isSelf = false) },
         onDismissClick = viewModel::closeDialog
     )
 }
@@ -144,7 +148,7 @@ fun SelfUserRegisterDialog(
 ) {
     if (isOpenDiagram) {
         AlertDialog(
-            onDismissRequest = { },
+            onDismissRequest = { onDismissClick() },
             title = { Text(stringResource(R.string.input_self_name)) },
             text = { TextField(value = inputText, onValueChange = { textFieldChanged(it) })},
             confirmButton = {
@@ -171,6 +175,8 @@ fun SelfUserRegisterDialog(
 
 @Composable
 fun OtherUserRegisterDialog(
+    isLoading: Boolean,
+    isSearchUserError: Boolean,
     isOpenDiagram: Boolean,
     isRegister: Boolean,
     idInputText: String,
@@ -184,21 +190,36 @@ fun OtherUserRegisterDialog(
     if (isOpenDiagram) {
         AlertDialog(
             onDismissRequest = { },
-            title = { Text("登録する方のIDと名前を入力してください") },
+            title = {
+                Text(stringResource(R.string.other_user_register_title_text))
+            },
             text = {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                Box(
+                    contentAlignment = Alignment.Center
                 ) {
-                    TextField(
-                        value = idInputText,
-                        onValueChange = { idTextFieldChanged(it) },
-                        label = { Text("ID")}
-                    )
-                    TextField(
-                        value = nameInputText,
-                        onValueChange = { nameTextFieldChanged(it) },
-                        label = { Text("名前")}
-                    )
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        TextField(
+                            value = idInputText,
+                            onValueChange = { idTextFieldChanged(it) },
+                            label = { Text(stringResource(R.string.id_text)) }
+                        )
+                        if (isSearchUserError) {
+                            Text(
+                                text = stringResource(R.string.other_user_register_error_text),
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                        TextField(
+                            value = nameInputText,
+                            onValueChange = { nameTextFieldChanged(it) },
+                            label = { Text(stringResource(R.string.other_user_name_text)) }
+                        )
+                    }
+                    if (isLoading) {
+                        CircularProgressIndicator()
+                    }
                 }
             },
             confirmButton = {
@@ -241,45 +262,14 @@ fun UserAddButton(
                 onClick = { addSelfUserButtonClick() },
                 modifier = Modifier.padding(end = 15.dp)
             ) {
-                Text("ユーザ登録")
+                Text(stringResource(R.string.user_add_button_text))
             }
         }
         Button(onClick = { addOtherUserButtonClick() }) {
-            Text("自分以外を登録")
+            Text(stringResource(R.string.other_user_add_button_text))
         }
     }
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//fun DialogPreview() {
-//    var inputText by rememberSaveable { mutableStateOf("") }
-//    SelfUserRegisterDialog(
-//        isOpenDiagram = true,
-//        isRegister = false,
-//        inputText = inputText,
-//        textFieldChanged = { inputText = it},
-//        onConfirmClick = {},
-//        onDismissClick = {}
-//    )
-//}
-//
-//@Preview(showBackground = true)
-//@Composable
-//fun OtherUserDialogPreview() {
-//    var idInputText by rememberSaveable { mutableStateOf("") }
-//    var nameInputText by rememberSaveable { mutableStateOf("") }
-//    OtherUserRegisterDialog(
-//        isOpenDiagram = true,
-//        isRegister = false,
-//        idInputText = idInputText,
-//        nameInputText = nameInputText,
-//        idTextFieldChanged = { idInputText = it},
-//        nameTextFieldChanged = { nameInputText = it},
-//        onConfirmClick = {},
-//        onDismissClick = {}
-//    )
-//}
 
 @Preview(showBackground = true)
 @Composable

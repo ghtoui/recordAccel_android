@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
 import javax.inject.Inject
 
 data class DetailScreenUiState(
@@ -46,7 +45,6 @@ class DetailScreenViewModel @Inject constructor(
     private val sumlizeAccDataUseCase: SumlizeAccDataUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DetailScreenUiState(isLoading = true))
-    private val mutex = Mutex()
     val uiState: StateFlow<DetailScreenUiState> = _uiState.asStateFlow()
     private var isLoadedDateList = false
     private var accDataList: MutableList<AccData> = getAccDataListUseCase(selectedDate = _uiState.value.selectedDateTime)

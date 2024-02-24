@@ -2,14 +2,21 @@ package com.moritoui.recordaccel.di
 
 import android.content.Context
 import android.hardware.SensorManager
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStoreFile
 import com.moritoui.recordaccel.BuildConfig
-import com.moritoui.recordaccel.di.Modules_ProvideAccelApiServiceFactory.create
 import com.moritoui.recordaccel.model.MotionSensor
 import com.moritoui.recordaccel.model.TimeManager
+import com.moritoui.recordaccel.model.User
+import com.moritoui.recordaccel.model.UserListDataRepository
+import com.moritoui.recordaccel.model.UserListDataRepositoryImpl
 import com.moritoui.recordaccel.network.AccelApiService
 import com.moritoui.recordaccel.repositories.SensorDataRepository
 import com.moritoui.recordaccel.repositories.SensorDataRepositoryImpl
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,7 +26,6 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import retrofit2.create
 import javax.inject.Singleton
 
 private const val BASE_URL = BuildConfig.DENO_ENDPOINT
@@ -27,7 +33,6 @@ private const val BASE_URL = BuildConfig.DENO_ENDPOINT
 @Module
 @InstallIn(SingletonComponent::class)
 object Modules {
-
     @Provides
     @Singleton
     fun provideSensorManager(@ApplicationContext context: Context): SensorManager {
@@ -41,7 +46,6 @@ object Modules {
     ): MotionSensor {
         return MotionSensor(
             sensorManager = sensorManager,
-            timeManager = TimeManager()
         )
     }
 
@@ -49,6 +53,25 @@ object Modules {
     @Singleton
     fun provideTimeManager(): TimeManager {
         return TimeManager()
+    }
+
+    @Provides
+    @Singleton
+    fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
+        return PreferenceDataStoreFactory.create(
+            produceFile = {
+                context.preferencesDataStoreFile("user_list")
+            }
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserListDataRepository(
+        dataStore: DataStore<Preferences>,
+        moshi: Moshi
+    ): UserListDataRepository {
+        return UserListDataRepositoryImpl(dataStore, moshi.adapter<MutableList<User>>(Types.newParameterizedType(MutableList::class.java, User::class.java)))
     }
 
     @Provides

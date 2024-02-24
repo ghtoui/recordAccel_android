@@ -10,7 +10,6 @@ import kotlin.math.pow
 
 class MotionSensor @Inject constructor(
     sensorManager: SensorManager,
-    private val timeManager: TimeManager
 ) : SensorEventListener {
     private var accSensor: Sensor? = null
     private var accDataList: MutableList<AccData> = mutableListOf()
@@ -44,10 +43,6 @@ class MotionSensor @Inject constructor(
 
     override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
         return
-    }
-
-    fun getAccData(): String {
-        return accData
     }
 
     fun getAccDataList(): MutableList<AccData> {
