@@ -6,7 +6,7 @@ import javax.inject.Inject
 
 class RemoveUserDataStoreUseCase @Inject constructor(
     private val userListDataRepository: UserListDataRepository
-){
+) {
     suspend operator fun invoke(user: User) {
         userListDataRepository.removeUser(user)
         userListDataRepository.saveUserList()

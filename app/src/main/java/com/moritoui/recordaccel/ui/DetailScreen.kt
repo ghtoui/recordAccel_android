@@ -130,7 +130,7 @@ fun AccChartView(
 
     Canvas(
         modifier = modifier
-            .pointerInteropFilter { motionEvent : MotionEvent ->
+            .pointerInteropFilter { motionEvent: MotionEvent ->
                 when (motionEvent.action) {
                     MotionEvent.ACTION_DOWN -> {
                         Log.d("action", "tap")
@@ -141,7 +141,7 @@ fun AccChartView(
                     MotionEvent.ACTION_UP -> {
                         Log.d("action", "up")
                     }
-                    else -> return@pointerInteropFilter  false
+                    else -> return@pointerInteropFilter false
                 }
                 true
             }

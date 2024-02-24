@@ -66,7 +66,7 @@ fun MainScreen(
         isOpenDiagram = uiState.isOpenSelfRegisterDialog,
         isRegister = uiState.isRegisterUser,
         inputText = uiState.selfNameInputText,
-        textFieldChanged = { viewModel.onChangedSelfNameTextField(it) } ,
+        textFieldChanged = { viewModel.onChangedSelfNameTextField(it) },
         onConfirmClick = { viewModel.registerUser(isSelf = true) },
         onDismissClick = viewModel::closeDialog
     )
@@ -150,7 +150,7 @@ fun SelfUserRegisterDialog(
         AlertDialog(
             onDismissRequest = { onDismissClick() },
             title = { Text(stringResource(R.string.input_self_name)) },
-            text = { TextField(value = inputText, onValueChange = { textFieldChanged(it) })},
+            text = { TextField(value = inputText, onValueChange = { textFieldChanged(it) }) },
             confirmButton = {
                 OutlinedButton(
                     onClick = { onConfirmClick() },

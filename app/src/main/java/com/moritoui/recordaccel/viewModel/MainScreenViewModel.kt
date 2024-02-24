@@ -49,7 +49,7 @@ class MainScreenViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             async { loadUserListUseCase() }.await()
-            _uiState.update{ currentState ->
+            _uiState.update { currentState ->
                 currentState.copy(isNotAddSelfUser = userList.value.all { it.userKind != UserKind.Self })
             }
         }
@@ -90,11 +90,11 @@ class MainScreenViewModel @Inject constructor(
                 error = true
             }
             updateRegisterLoadingState(false)
-            if  (error) {
+            if (error) {
                 delay(5000)
                 updateSearchUserErrorState(false)
             }
-            _uiState.update{ currentState ->
+            _uiState.update { currentState ->
                 currentState.copy(isNotAddSelfUser = userList.value.all { it.userKind != UserKind.Self })
             }
         }

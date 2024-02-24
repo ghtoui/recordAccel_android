@@ -28,6 +28,6 @@ interface AccelApiService {
 
     @POST("/")
     suspend fun postAccData(
-        @Body body:  List<PostAccData>
+        @Body body: List<PostAccData>
     )
 }
