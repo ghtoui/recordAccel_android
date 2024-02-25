@@ -19,7 +19,7 @@ interface SensorDataRepository {
     fun sumlizeAccList(): MutableList<AccData>
     suspend fun getApiAccelDateList(pageNumber: Int): MutableList<String>
     suspend fun getApiAccelDataList(selectDate: String)
-    suspend fun postAccelDataList()
+    suspend fun postAccelDataList(selfUser: User)
 }
 class SensorDataRepositoryImpl @Inject constructor(
     private val motionSensor: MotionSensor,
@@ -84,11 +84,11 @@ class SensorDataRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun postAccelDataList() {
+    override suspend fun postAccelDataList(selfUser: User) {
         try {
             val postAccData: List<PostAccData> = tempAccDataList.map {
                 PostAccData(
-                    userId = selectedUser!!.userId,
+                    userId = selfUser.userId,
                     accData = it.resultAcc,
                     date = timeManager.dateToISOText(it.date)
                 )
