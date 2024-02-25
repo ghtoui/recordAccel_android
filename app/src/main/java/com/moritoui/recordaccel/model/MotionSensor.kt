@@ -10,11 +10,9 @@ import kotlin.math.pow
 
 class MotionSensor @Inject constructor(
     sensorManager: SensorManager,
-    private val timeManager: TimeManager
 ) : SensorEventListener {
     private var accSensor: Sensor? = null
     private var accDataList: MutableList<AccData> = mutableListOf()
-    private var accData: String = ""
     private val EXPONENT = 2.0
     private val ROOT = 0.5
 
@@ -37,17 +35,13 @@ class MotionSensor @Inject constructor(
         accDataList.add(
             AccData(
                 resultAcc = resultAcc,
-                date = timeManager.dateToText(LocalDateTime.now())
+                date = LocalDateTime.now()
             )
         )
     }
 
     override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
         return
-    }
-
-    fun getAccData(): String {
-        return accData
     }
 
     fun getAccDataList(): MutableList<AccData> {

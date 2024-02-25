@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">recordAccel</string>
+    <string name="input_self_name">あなたの名前を入力してください</string>
+    <string name="register_button_text">登録</string>
+    <string name="cancel_button_text">キャンセル</string>
+    <string name="other_user_register_error_text">IDが見つかりませんでした\nIDが間違っているか、通信環境が悪い可能性があります</string>
+    <string name="id_text">ID</string>
+    <string name="other_user_register_title_text">登録する方のIDと名前を入力してください</string>
+    <string name="other_user_name_text">名前</string>
+    <string name="user_add_button_text">ユーザ登録</string>
+    <string name="other_user_add_button_text">自分以外を登録</string>
 </resources>
