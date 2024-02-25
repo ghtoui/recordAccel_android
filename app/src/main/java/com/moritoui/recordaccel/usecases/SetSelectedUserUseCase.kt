@@ -7,7 +7,7 @@ import javax.inject.Inject
 class SetSelectedUserUseCase @Inject constructor(
     private val userListDataRepository: UserListDataRepository
 ) {
-    operator fun invoke (selectUser: User) {
+    operator fun invoke(selectUser: User) {
         userListDataRepository.selectedUser = selectUser
     }
 }

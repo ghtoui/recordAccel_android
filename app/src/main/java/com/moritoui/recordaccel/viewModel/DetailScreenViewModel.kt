@@ -64,10 +64,12 @@ class DetailScreenViewModel @Inject constructor(
                 if (!isLoadedDateList) {
                     isLoadedDateList = true
                     // 保存されているものだけ渡す
-                    val getAsyncDateList = async { getDateListUseCase(
-                        pageNumber = 0,
-                        dateList = _uiState.value.dateList
-                    ) }
+                    val getAsyncDateList = async {
+                        getDateListUseCase(
+                            pageNumber = 0,
+                            dateList = _uiState.value.dateList
+                        )
+                    }
                     val accDateList = getAsyncDateList.await()
                     updateSelectedDatetime(accDateList.last())
                     updateDateList(accDateList)
