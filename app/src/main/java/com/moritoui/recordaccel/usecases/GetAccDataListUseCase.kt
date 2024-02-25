@@ -11,7 +11,11 @@ class GetAccDataListUseCase @Inject constructor(
 ) {
     operator fun invoke(userKind: UserKind?, selectedDate: String?): MutableList<AccData> {
         val accDataList = sensorDataRepository.accDataList
-        val date = accDataList.groupBy { it.date.format(DateTimeFormatter.ISO_LOCAL_DATE) }.keys.first()
+        val date = if (accDataList.isEmpty()) {
+            ""
+        } else {
+            accDataList.groupBy { it.date.format(DateTimeFormatter.ISO_LOCAL_DATE) }.keys.last()
+        }
         val data = if ((selectedDate == null || selectedDate == date) && userKind == UserKind.Self) {
             (sensorDataRepository.apiAccDataList + accDataList).toMutableList()
         } else {

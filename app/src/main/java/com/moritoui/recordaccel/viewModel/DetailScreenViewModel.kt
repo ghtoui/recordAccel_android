@@ -3,14 +3,13 @@ package com.moritoui.recordaccel.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moritoui.recordaccel.model.AccData
+import com.moritoui.recordaccel.model.SensorCollectSender
 import com.moritoui.recordaccel.model.TimeManager
 import com.moritoui.recordaccel.model.TimeTerm
 import com.moritoui.recordaccel.usecases.GetAccDataListUseCase
 import com.moritoui.recordaccel.usecases.GetAccDateListUseCase
 import com.moritoui.recordaccel.usecases.GetApiAccelDataUseCase
 import com.moritoui.recordaccel.usecases.GetSelectedUserUseCase
-import com.moritoui.recordaccel.usecases.SumlizeAccDataUseCase
-import com.moritoui.recordaccel.usecases.UpdateAccDataListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -40,11 +39,10 @@ data class DetailScreenUiState(
 class DetailScreenViewModel @Inject constructor(
     private val timeManager: TimeManager,
     private val getAccDataListUseCase: GetAccDataListUseCase,
-    private val updateAccDataListUseCase: UpdateAccDataListUseCase,
     private val getDateListUseCase: GetAccDateListUseCase,
     private val getApiAccelDataUseCase: GetApiAccelDataUseCase,
-    private val sumlizeAccDataUseCase: SumlizeAccDataUseCase,
-    getSelectedUserUseCase: GetSelectedUserUseCase
+    getSelectedUserUseCase: GetSelectedUserUseCase,
+    sensorCollectSender: SensorCollectSender,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DetailScreenUiState(isLoading = true))
     val uiState: StateFlow<DetailScreenUiState> = _uiState.asStateFlow()
@@ -59,7 +57,6 @@ class DetailScreenViewModel @Inject constructor(
             while (true) {
                 delay(1000)
                 updateIsLoading(false)
-                updateAccDataListUseCase()
                 accDataList = getAccDataListUseCase(userKind = selectedUser?.userKind, selectedDate = _uiState.value.selectedDateTime)
                 if (!isLoadedDateList) {
                     isLoadedDateList = true
@@ -71,19 +68,12 @@ class DetailScreenViewModel @Inject constructor(
                         )
                     }
                     val accDateList = getAsyncDateList.await()
-                    updateSelectedDatetime(accDateList.last())
+                    if (accDateList.isNotEmpty()) {
+                        updateSelectedDatetime(accDateList.last())
+                    }
                     updateDateList(accDateList)
                 }
                 updateSensorUiState(accDataList)
-            }
-        }
-
-        // 30秒毎に加速度をまとめる
-        // 指定数ごとにpushする
-        viewModelScope.launch {
-            while (true) {
-                delay(1000 * 30)
-                sumlizeAccDataUseCase(pushCount = 3)
             }
         }
     }

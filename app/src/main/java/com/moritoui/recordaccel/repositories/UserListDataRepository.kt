@@ -15,7 +15,6 @@ import javax.inject.Inject
 
 interface UserListDataRepository {
     val userList: StateFlow<List<User>>
-    var selectedUser: User?
     suspend fun saveUserList()
     suspend fun loadUserList()
     fun addUser(user: User)
@@ -29,7 +28,6 @@ class UserListDataRepositoryImpl @Inject constructor(
     private val USER_LIST = "user_list"
     private val _userList = MutableStateFlow<MutableList<User>>(mutableListOf())
     override val userList: StateFlow<List<User>> = _userList.asStateFlow()
-    override var selectedUser: User? = null
 
     override suspend fun saveUserList() {
         val userListJson = jsonAdapter.toJson(_userList.value)

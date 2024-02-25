@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import com.moritoui.recordaccel.BuildConfig
 import com.moritoui.recordaccel.model.MotionSensor
+import com.moritoui.recordaccel.model.SensorCollectSender
 import com.moritoui.recordaccel.model.TimeManager
 import com.moritoui.recordaccel.model.User
 import com.moritoui.recordaccel.network.AccelApiService
@@ -15,7 +16,9 @@ import com.moritoui.recordaccel.repositories.SensorDataRepository
 import com.moritoui.recordaccel.repositories.SensorDataRepositoryImpl
 import com.moritoui.recordaccel.repositories.UserListDataRepository
 import com.moritoui.recordaccel.repositories.UserListDataRepositoryImpl
-import com.moritoui.recordaccel.usecases.GetSelectedUserUseCase
+import com.moritoui.recordaccel.usecases.GetSelfUserUseCase
+import com.moritoui.recordaccel.usecases.SumlizeAccDataUseCase
+import com.moritoui.recordaccel.usecases.UpdateAccDataListUseCase
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import dagger.Module
@@ -77,8 +80,8 @@ object Modules {
 
     @Provides
     @Singleton
-    fun provideSensorDataRepository(timeManager: TimeManager, motionSensor: MotionSensor, accelApiService: AccelApiService, getSelectedUserUseCase: GetSelectedUserUseCase): SensorDataRepository {
-        return SensorDataRepositoryImpl(motionSensor = motionSensor, timeManager = timeManager, accelApi = accelApiService, getSelectedUserUseCase = getSelectedUserUseCase)
+    fun provideSensorDataRepository(timeManager: TimeManager, motionSensor: MotionSensor, accelApiService: AccelApiService): SensorDataRepository {
+        return SensorDataRepositoryImpl(motionSensor = motionSensor, timeManager = timeManager, accelApi = accelApiService)
     }
 
     @Provides
@@ -114,5 +117,19 @@ object Modules {
     fun provideAccelApiService(retrofit: Retrofit): AccelApiService {
         return retrofit
             .create(AccelApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSensorCollectSender(
+        getSelfUserUseCase: GetSelfUserUseCase,
+        updateAccDataListUseCase: UpdateAccDataListUseCase,
+        sumlizeAccDataUseCase: SumlizeAccDataUseCase
+    ): SensorCollectSender {
+        return SensorCollectSender(
+            getSelfUserUseCase,
+            updateAccDataListUseCase,
+            sumlizeAccDataUseCase
+        )
     }
 }
