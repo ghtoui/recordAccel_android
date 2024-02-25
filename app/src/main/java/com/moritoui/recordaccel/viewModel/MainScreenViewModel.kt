@@ -10,6 +10,7 @@ import com.moritoui.recordaccel.usecases.IsRegisterUserUseCase
 import com.moritoui.recordaccel.usecases.LoadUserListUseCase
 import com.moritoui.recordaccel.usecases.RegisterUserDataStoreUseCase
 import com.moritoui.recordaccel.usecases.RemoveUserDataStoreUseCase
+import com.moritoui.recordaccel.usecases.SetSelectedUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.UUID
 import kotlinx.coroutines.async
@@ -41,6 +42,7 @@ class MainScreenViewModel @Inject constructor(
     private val isRegisterUserUseCase: IsRegisterUserUseCase,
     private val loadUserListUseCase: LoadUserListUseCase,
     getUserListUseCase: GetUserListUseCase,
+    private val setSelectedUserUseCase: SetSelectedUserUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(MainScreenUiState())
     val uiState: StateFlow<MainScreenUiState> = _uiState.asStateFlow()
@@ -153,6 +155,10 @@ class MainScreenViewModel @Inject constructor(
             )
         }
         resetRegisterUiState()
+    }
+
+    fun selectUser(selectUser: User) {
+        setSelectedUserUseCase(selectUser)
     }
 
     private fun checkUUID(id: String): Boolean {

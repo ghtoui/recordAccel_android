@@ -8,6 +8,7 @@ import com.moritoui.recordaccel.model.TimeTerm
 import com.moritoui.recordaccel.usecases.GetAccDataListUseCase
 import com.moritoui.recordaccel.usecases.GetAccDateListUseCase
 import com.moritoui.recordaccel.usecases.GetApiAccelDataUseCase
+import com.moritoui.recordaccel.usecases.GetSelectedUserUseCase
 import com.moritoui.recordaccel.usecases.SumlizeAccDataUseCase
 import com.moritoui.recordaccel.usecases.UpdateAccDataListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -42,12 +43,14 @@ class DetailScreenViewModel @Inject constructor(
     private val updateAccDataListUseCase: UpdateAccDataListUseCase,
     private val getDateListUseCase: GetAccDateListUseCase,
     private val getApiAccelDataUseCase: GetApiAccelDataUseCase,
-    private val sumlizeAccDataUseCase: SumlizeAccDataUseCase
+    private val sumlizeAccDataUseCase: SumlizeAccDataUseCase,
+    getSelectedUserUseCase: GetSelectedUserUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DetailScreenUiState(isLoading = true))
     val uiState: StateFlow<DetailScreenUiState> = _uiState.asStateFlow()
     private var isLoadedDateList = false
-    private var accDataList: MutableList<AccData> = getAccDataListUseCase(selectedDate = _uiState.value.selectedDateTime)
+    private var selectedUser = getSelectedUserUseCase()
+    private var accDataList: MutableList<AccData> = getAccDataListUseCase(userKind = selectedUser?.userKind, selectedDate = _uiState.value.selectedDateTime)
 
     init {
         updateXAxis()
@@ -57,11 +60,14 @@ class DetailScreenViewModel @Inject constructor(
                 delay(1000)
                 updateIsLoading(false)
                 updateAccDataListUseCase()
-                accDataList = getAccDataListUseCase(selectedDate = _uiState.value.selectedDateTime)
+                accDataList = getAccDataListUseCase(userKind = selectedUser?.userKind, selectedDate = _uiState.value.selectedDateTime)
                 if (!isLoadedDateList) {
                     isLoadedDateList = true
                     // 保存されているものだけ渡す
-                    val getAsyncDateList = async { getDateListUseCase() }
+                    val getAsyncDateList = async { getDateListUseCase(
+                        pageNumber = 0,
+                        dateList = _uiState.value.dateList
+                    ) }
                     val accDateList = getAsyncDateList.await()
                     updateSelectedDatetime(accDateList.last())
                     updateDateList(accDateList)

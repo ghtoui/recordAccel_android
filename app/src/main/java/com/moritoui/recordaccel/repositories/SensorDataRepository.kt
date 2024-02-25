@@ -5,7 +5,9 @@ import com.moritoui.recordaccel.model.AccData
 import com.moritoui.recordaccel.model.MotionSensor
 import com.moritoui.recordaccel.model.PostAccData
 import com.moritoui.recordaccel.model.TimeManager
+import com.moritoui.recordaccel.model.User
 import com.moritoui.recordaccel.network.AccelApiService
+import com.moritoui.recordaccel.usecases.GetSelectedUserUseCase
 import java.io.IOException
 import java.time.LocalDateTime
 import kotlinx.coroutines.Dispatchers
@@ -16,21 +18,25 @@ interface SensorDataRepository {
     var accDataList: MutableList<AccData>
     var apiAccDataList: MutableList<AccData>
     var sumlizeCount: Int
+    var selectedUser: User?
     fun updateAccDataList()
     fun sumlizeAccList(): MutableList<AccData>
-    suspend fun getApiAccelDateList(): MutableList<String>
+    fun updateSelectedUser()
+    suspend fun getApiAccelDateList(pageNumber: Int): MutableList<String>
     suspend fun getApiAccelDataList(selectDate: String)
     suspend fun postAccelDataList()
 }
 class SensorDataRepositoryImpl @Inject constructor(
     private val motionSensor: MotionSensor,
     private val accelApi: AccelApiService,
-    private val timeManager: TimeManager
+    private val timeManager: TimeManager,
+    private val getSelectedUserUseCase: GetSelectedUserUseCase
 ) : SensorDataRepository {
     private val tempAccDataList: MutableList<AccData> = mutableListOf()
     override var accDataList: MutableList<AccData> = mutableListOf()
     override var apiAccDataList: MutableList<AccData> = mutableListOf()
     override var sumlizeCount = 0
+    override var selectedUser: User? = getSelectedUserUseCase()
 
     init {
         updateAccDataList()
@@ -56,17 +62,17 @@ class SensorDataRepositoryImpl @Inject constructor(
         return tempAccDataList
     }
 
-    private fun clearSumlizeCount() {
-        this.sumlizeCount = 0
+    override fun updateSelectedUser() {
+        selectedUser = getSelectedUserUseCase()
     }
 
-    override suspend fun getApiAccelDateList(): MutableList<String> {
+    override suspend fun getApiAccelDateList(pageNumber: Int): MutableList<String> {
         var dateList: MutableList<String> = mutableListOf()
         withContext(Dispatchers.IO) {
             try {
-                dateList = accelApi.getAccDateList(userId = "123", pageNumber = 0).body()!!.toMutableList()
+                dateList = accelApi.getAccDateList(userId = selectedUser!!.userId, pageNumber = pageNumber).body()!!.toMutableList()
             } catch (error: IOException) {
-                Log.d("error", "fetch dateList error: $error")
+                Log.e("error", "fetch dateList error: $error")
             }
         }
         return dateList
@@ -75,7 +81,7 @@ class SensorDataRepositoryImpl @Inject constructor(
     override suspend fun getApiAccelDataList(selectDate: String) {
         withContext(Dispatchers.IO) {
             try {
-                val accJsonData = accelApi.getAccDataList("123", selectDate).body()
+                val accJsonData = accelApi.getAccDataList(selectedUser!!.userId, selectDate).body()
                 if (!accJsonData.isNullOrEmpty()) {
                     apiAccDataList = accJsonData.first().accDatas.map {
                         AccData(
@@ -85,26 +91,34 @@ class SensorDataRepositoryImpl @Inject constructor(
                     }.toMutableList()
                 } else { }
             } catch (error: IOException) {
-                Log.d("error", "$error")
+                Log.e("error", "$error")
+            } catch (error: NullPointerException) {
+                Log.e("error", "user is null")
             }
         }
     }
 
     override suspend fun postAccelDataList() {
         withContext(Dispatchers.IO) {
-            val postAccData: List<PostAccData> = tempAccDataList.map {
-                PostAccData(
-                    userId = "123",
-                    accData = it.resultAcc,
-                    date = timeManager.dateToISOText(it.date)
-                )
-            }.takeLast(sumlizeCount)
             try {
+                val postAccData: List<PostAccData> = tempAccDataList.map {
+                    PostAccData(
+                        userId = selectedUser!!.userId,
+                        accData = it.resultAcc,
+                        date = timeManager.dateToISOText(it.date)
+                    )
+                }.takeLast(sumlizeCount)
                 clearSumlizeCount()
                 accelApi.postAccData(body = postAccData)
             } catch (error: IOException) {
-                Log.d("error", "fetch post error: $error")
+                Log.e("error", "fetch post error: $error")
+            } catch (error: NullPointerException) {
+                Log.e("error", "user is null")
             }
         }
+    }
+
+    private fun clearSumlizeCount() {
+        this.sumlizeCount = 0
     }
 }

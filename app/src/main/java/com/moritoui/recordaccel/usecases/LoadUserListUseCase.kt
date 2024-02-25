@@ -1,6 +1,6 @@
 package com.moritoui.recordaccel.usecases
 
-import com.moritoui.recordaccel.model.UserListDataRepository
+import com.moritoui.recordaccel.repositories.UserListDataRepository
 import javax.inject.Inject
 
 class LoadUserListUseCase @Inject constructor(

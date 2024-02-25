@@ -1,3 +1,4 @@
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -53,7 +54,12 @@ fun MainScreen(
     ) {
         MainUserList(
             userList = userList,
-            popUp = popUp,
+            popUp = remember {
+                {
+                    popUp()
+                    viewModel.selectUser(it)
+                }
+            },
             modifier = Modifier.padding(top = 10.dp, bottom = 10.dp)
         )
         UserAddButton(
@@ -91,7 +97,7 @@ fun MainScreen(
 @Composable
 fun MainUserList(
     userList: List<User>,
-    popUp: () -> Unit,
+    popUp: (User) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -114,7 +120,7 @@ fun MainUserList(
 @Composable
 fun ListElement(
     user: User,
-    onElementClick: () -> Unit,
+    onElementClick: (User) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -124,7 +130,7 @@ fun ListElement(
         modifier = modifier
             .fillMaxWidth()
             .height(100.dp)
-            .clickable { onElementClick() }
+            .clickable { onElementClick(user) }
     ) {
         Text(
             user.userName,

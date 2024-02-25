@@ -4,11 +4,10 @@ import com.moritoui.recordaccel.model.User
 import com.moritoui.recordaccel.repositories.UserListDataRepository
 import javax.inject.Inject
 
-class RegisterUserDataStoreUseCase @Inject constructor(
+class GetSelectedUserUseCase @Inject constructor(
     private val userListDataRepository: UserListDataRepository
 ) {
-    suspend operator fun invoke(user: User) {
-        userListDataRepository.addUser(user)
-        userListDataRepository.saveUserList()
+    operator fun invoke(): User? {
+        return userListDataRepository.selectedUser
     }
 }

@@ -13,7 +13,6 @@ class MotionSensor @Inject constructor(
 ) : SensorEventListener {
     private var accSensor: Sensor? = null
     private var accDataList: MutableList<AccData> = mutableListOf()
-    private var accData: String = ""
     private val EXPONENT = 2.0
     private val ROOT = 0.5
 

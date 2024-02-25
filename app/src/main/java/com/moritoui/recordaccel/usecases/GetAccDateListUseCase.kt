@@ -8,9 +8,9 @@ import javax.inject.Inject
 class GetAccDateListUseCase @Inject constructor(
     private val sensorDataRepository: SensorDataRepository
 ) {
-    suspend operator fun invoke(): MutableList<String> {
+    suspend operator fun invoke(pageNumber: Int, dateList: MutableList<String>): MutableList<String> {
         val accDataList = sensorDataRepository.accDataList
-        return (sensorDataRepository.getApiAccelDateList() + extractDateList(accDataList))
+        return (sensorDataRepository.getApiAccelDateList(pageNumber) + dateList + extractDateList(accDataList))
             .groupBy { it }.keys.toMutableList()
     }
 

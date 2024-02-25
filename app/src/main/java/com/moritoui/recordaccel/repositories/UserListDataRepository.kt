@@ -1,9 +1,10 @@
-package com.moritoui.recordaccel.model
+package com.moritoui.recordaccel.repositories
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.moritoui.recordaccel.model.User
 import com.squareup.moshi.JsonAdapter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,6 +15,7 @@ import javax.inject.Inject
 
 interface UserListDataRepository {
     val userList: StateFlow<List<User>>
+    var selectedUser: User?
     suspend fun saveUserList()
     suspend fun loadUserList()
     fun addUser(user: User)
@@ -27,6 +29,7 @@ class UserListDataRepositoryImpl @Inject constructor(
     private val USER_LIST = "user_list"
     private val _userList = MutableStateFlow<MutableList<User>>(mutableListOf())
     override val userList: StateFlow<List<User>> = _userList.asStateFlow()
+    override var selectedUser: User? = null
 
     override suspend fun saveUserList() {
         val userListJson = jsonAdapter.toJson(_userList.value)
