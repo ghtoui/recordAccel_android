@@ -10,6 +10,6 @@ class GetSelfUserUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(): User? {
         loadUserListUseCase()
-        return getUserListUseCase().value.first { it.userKind == UserKind.Self }
+        return getUserListUseCase().value.firstOrNull { it.userKind == UserKind.Self }
     }
 }
