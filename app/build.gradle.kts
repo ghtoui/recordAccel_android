@@ -24,6 +24,7 @@ android {
             useSupportLibrary = true
         }
         buildConfigField("String", "DENO_ENDPOINT", "\"${project.properties["DENO_ENDPOINT"]}\"")
+        buildConfigField("String", "FOREGROUND_SENSOR_CHANNEL_NAME", "\"${project.properties["FOREGROUND_SENSOR_CHANNEL_NAME"]}\"")
     }
 
     buildTypes {
