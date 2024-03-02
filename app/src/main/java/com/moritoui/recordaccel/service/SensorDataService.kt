@@ -44,8 +44,12 @@ class SensorDataService @Inject constructor() : Service() {
         val sendIntent = Intent(applicationContext, SensorBroadCastReceiver::class.java).apply {
             action = ForegroundState.STOP.name
         }
-        val sendPendingIntent = PendingIntent.getBroadcast(this, 0, sendIntent,
-            PendingIntent.FLAG_IMMUTABLE)
+        val sendPendingIntent = PendingIntent.getBroadcast(
+            this,
+            0,
+            sendIntent,
+            PendingIntent.FLAG_IMMUTABLE
+        )
         val notification = NotificationCompat.Builder(
             this,
             BuildConfig.FOREGROUND_SENSOR_CHANNEL_NAME
@@ -58,11 +62,17 @@ class SensorDataService @Inject constructor() : Service() {
 
     private fun stopSensorService() {
         sensorCollectSender.isCollect = false
-        val sendIntent = Intent(this, SensorBroadCastReceiver::class.java).apply {
-                action = ForegroundState.START.name
+        val sendIntent = Intent(
+            this,
+            SensorBroadCastReceiver::class.java
+        ).apply {
+            action = ForegroundState.START.name
         }
-        val sendPendingIntent = PendingIntent.getBroadcast(this, 0, sendIntent,
-            PendingIntent.FLAG_IMMUTABLE)
+        val sendPendingIntent = PendingIntent.getBroadcast(
+            this,
+            0, sendIntent,
+            PendingIntent.FLAG_IMMUTABLE
+        )
         val notification = NotificationCompat.Builder(
             this,
             BuildConfig.FOREGROUND_SENSOR_CHANNEL_NAME
