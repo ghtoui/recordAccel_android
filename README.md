@@ -8,11 +8,9 @@
 - スマホの加速度センサから加速度を取得し、サーバーにアップロードすることで、ユーザのIDを知る他のユーザからリアルタイムで見守りができるアプリ
 
 ## アプリ情報
-
-![アプリアイコン](./resource/App Icon.png)
-![フィーチャーグラフィック](./resource/featureGraphics.png)
-![メイン画面](./resource/mainScreen.png)
-![詳細画面](./resource/registerDialog.png)
+|アイコン                                          |フィーチャーグラフィック                                  |メイン画面                                           |詳細画面                                               |
+|--------------------------------------------------|----------------------------------------------------------|-----------------------------------------------------|-------------------------------------------------------|
+|<img src="./resource/appIcon.png" width="200dp" />|<img src="./resource/featureGraphics.png" width="700dp" />|<img src="./resource/mainScreen.png" width="200dp" />|<img src="./resource/detailScreen.png" width="200dp" />|
 
 ## 開発背景
 
