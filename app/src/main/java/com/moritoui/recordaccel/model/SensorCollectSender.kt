@@ -17,7 +17,9 @@ class SensorCollectSender @Inject constructor(
     private val updateAccDataListUseCase: UpdateAccDataListUseCase,
     private val sumlizeAccDataUseCase: SumlizeAccDataUseCase
 ) {
-    init {
+    var isCollect = true
+
+    fun updateAndSendAccData() {
         if (updateAccDataJob?.isActive != true) {
             updateAccDataJob = CoroutineScope(Dispatchers.Default).launch {
                 updateAccData()
@@ -37,14 +39,14 @@ class SensorCollectSender @Inject constructor(
     }
 
     private suspend fun updateAccData() {
-        while (true) {
+        while (isCollect) {
             delay(1000)
             updateAccDataListUseCase()
         }
     }
 
     private suspend fun sumlizeAccData(selfUser: User) {
-        while (true) {
+        while (isCollect) {
             delay(1000 * 30)
             sumlizeAccDataUseCase(selfUser, pushCount = 3)
         }

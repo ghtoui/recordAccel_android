@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId = "com.moritoui.recordaccel"
-        minSdk = 28
+        minSdk = 29
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -24,6 +24,7 @@ android {
             useSupportLibrary = true
         }
         buildConfigField("String", "DENO_ENDPOINT", "\"${project.properties["DENO_ENDPOINT"]}\"")
+        buildConfigField("String", "FOREGROUND_SENSOR_CHANNEL_NAME", "\"${project.properties["FOREGROUND_SENSOR_CHANNEL_NAME"]}\"")
     }
 
     buildTypes {

@@ -2,7 +2,6 @@ package com.moritoui.recordaccel.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.moritoui.recordaccel.model.SensorCollectSender
 import com.moritoui.recordaccel.model.User
 import com.moritoui.recordaccel.model.UserKind
 import com.moritoui.recordaccel.usecases.GetSelfUserUseCase
@@ -46,8 +45,6 @@ class MainScreenViewModel @Inject constructor(
     private val loadUserListUseCase: LoadUserListUseCase,
     getUserListUseCase: GetUserListUseCase,
     private val setSelectedUserUseCase: SetSelectedUserUseCase,
-    private val getSelfUserUseCase: GetSelfUserUseCase,
-    sensorCollectSender: SensorCollectSender
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(MainScreenUiState())
     val uiState: StateFlow<MainScreenUiState> = _uiState.asStateFlow()

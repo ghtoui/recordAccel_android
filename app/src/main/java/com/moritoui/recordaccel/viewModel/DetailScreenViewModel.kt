@@ -3,7 +3,6 @@ package com.moritoui.recordaccel.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moritoui.recordaccel.model.AccData
-import com.moritoui.recordaccel.model.SensorCollectSender
 import com.moritoui.recordaccel.model.TimeManager
 import com.moritoui.recordaccel.model.TimeTerm
 import com.moritoui.recordaccel.usecases.GetAccDataListUseCase
@@ -42,7 +41,6 @@ class DetailScreenViewModel @Inject constructor(
     private val getDateListUseCase: GetAccDateListUseCase,
     private val getApiAccelDataUseCase: GetApiAccelDataUseCase,
     getSelectedUserUseCase: GetSelectedUserUseCase,
-    sensorCollectSender: SensorCollectSender,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DetailScreenUiState(isLoading = true))
     val uiState: StateFlow<DetailScreenUiState> = _uiState.asStateFlow()
