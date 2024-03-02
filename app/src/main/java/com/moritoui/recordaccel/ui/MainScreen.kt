@@ -407,9 +407,9 @@ fun ShowUserId(
             Spacer(modifier = Modifier.weight(1f))
             IconButton(
                 onClick = {
-                clipBoardManager.setText(AnnotatedString(userId))
-                onCopyButtonClick()
-            }
+                    clipBoardManager.setText(AnnotatedString(userId))
+                    onCopyButtonClick()
+                }
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.content_copy),
