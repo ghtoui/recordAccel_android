@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.moritoui.recordaccel.model.SensorCollectSender
 import com.moritoui.recordaccel.model.User
 import com.moritoui.recordaccel.model.UserKind
+import com.moritoui.recordaccel.usecases.GetSelfUserUseCase
 import com.moritoui.recordaccel.usecases.GetUserListUseCase
 import com.moritoui.recordaccel.usecases.IsRegisterUserUseCase
 import com.moritoui.recordaccel.usecases.LoadUserListUseCase
@@ -31,7 +32,10 @@ data class MainScreenUiState(
     val idInputText: String = "",
     val isRegisterUser: Boolean = false,
     val isRegisterLoading: Boolean = false,
-    val isSearchUserError: Boolean = false
+    val isSearchUserError: Boolean = false,
+    val isOpenBottomSheet: Boolean = false,
+    val selfUserId: String? = null,
+    val isEdit: Boolean = false
 )
 
 @HiltViewModel
@@ -42,7 +46,8 @@ class MainScreenViewModel @Inject constructor(
     private val loadUserListUseCase: LoadUserListUseCase,
     getUserListUseCase: GetUserListUseCase,
     private val setSelectedUserUseCase: SetSelectedUserUseCase,
-    sensorCollectSender: SensorCollectSender,
+    private val getSelfUserUseCase: GetSelfUserUseCase,
+    sensorCollectSender: SensorCollectSender
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(MainScreenUiState())
     val uiState: StateFlow<MainScreenUiState> = _uiState.asStateFlow()
@@ -102,7 +107,7 @@ class MainScreenViewModel @Inject constructor(
         }
     }
 
-    fun removeUser(user: User) {
+    fun deleteUser(user: User) {
         viewModelScope.launch {
             removeUserDataStoreUseCase(user)
         }
@@ -138,6 +143,7 @@ class MainScreenViewModel @Inject constructor(
     fun openSelfUserRegisterDialog() {
         _uiState.update {
             it.copy(isOpenSelfRegisterDialog = true)
+
         }
     }
 
@@ -159,6 +165,29 @@ class MainScreenViewModel @Inject constructor(
 
     fun selectUser(selectUser: User) {
         setSelectedUserUseCase(selectUser)
+    }
+
+    fun openSelfUserInfoBottomSheet() {
+        _uiState.update {
+            it.copy(
+                selfUserId = userList.value.firstOrNull { it.userKind == UserKind.Self }?.userId,
+                isOpenBottomSheet = true
+            )
+        }
+    }
+
+    fun closeSelfUserInfoBottomSheet() {
+        _uiState.update {
+            it.copy(isOpenBottomSheet = false)
+        }
+    }
+
+    fun changeEditState(changeEditState: Boolean) {
+        _uiState.update {
+            it.copy(
+                isEdit = changeEditState
+            )
+        }
     }
 
     private fun checkUUID(id: String): Boolean {

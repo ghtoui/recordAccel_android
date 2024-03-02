@@ -34,6 +34,7 @@ class UserListDataRepositoryImpl @Inject constructor(
         userListDataStore.edit { settings ->
             settings[stringPreferencesKey(USER_LIST)] = userListJson
         }
+        loadUserList()
     }
 
     override suspend fun loadUserList() {
