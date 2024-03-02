@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-        val intent= Intent(applicationContext, SensorDataService::class.java).also {
+        val intent = Intent(applicationContext, SensorDataService::class.java).also {
             it.action = ForegroundState.START.name
         }
         startForegroundService(intent)
