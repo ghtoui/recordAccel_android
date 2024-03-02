@@ -44,8 +44,6 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -172,14 +170,13 @@ fun AccChartView(
                 }
             }
         }
-
-        drawText(
+//        drawText(
 //            topLeft = Offset(size.width, size.height),
-            topLeft = Offset(600.toFloat(), size.height - 40),
-            style = TextStyle.Default,
-            textMeasurer = textMeasurer,
-            text = "aaaaaaaaaa"
-        )
+//            topLeft = Offset(600.toFloat(), size.height - 40),
+//            style = TextStyle.Default,
+//            textMeasurer = textMeasurer,
+//            text = "aaaaaaaaaa"
+//        )
 
         drawPoints(
             points = points,

@@ -30,7 +30,10 @@ data class MainScreenUiState(
     val idInputText: String = "",
     val isRegisterUser: Boolean = false,
     val isRegisterLoading: Boolean = false,
-    val isSearchUserError: Boolean = false
+    val isSearchUserError: Boolean = false,
+    val isOpenBottomSheet: Boolean = false,
+    val selfUserId: String? = null,
+    val isEdit: Boolean = false
 )
 
 @HiltViewModel
@@ -100,7 +103,7 @@ class MainScreenViewModel @Inject constructor(
         }
     }
 
-    fun removeUser(user: User) {
+    fun deleteUser(user: User) {
         viewModelScope.launch {
             removeUserDataStoreUseCase(user)
         }
@@ -157,6 +160,29 @@ class MainScreenViewModel @Inject constructor(
 
     fun selectUser(selectUser: User) {
         setSelectedUserUseCase(selectUser)
+    }
+
+    fun openSelfUserInfoBottomSheet() {
+        _uiState.update {
+            it.copy(
+                selfUserId = userList.value.firstOrNull { it.userKind == UserKind.Self }?.userId,
+                isOpenBottomSheet = true
+            )
+        }
+    }
+
+    fun closeSelfUserInfoBottomSheet() {
+        _uiState.update {
+            it.copy(isOpenBottomSheet = false)
+        }
+    }
+
+    fun changeEditState(changeEditState: Boolean) {
+        _uiState.update {
+            it.copy(
+                isEdit = changeEditState
+            )
+        }
     }
 
     private fun checkUUID(id: String): Boolean {
