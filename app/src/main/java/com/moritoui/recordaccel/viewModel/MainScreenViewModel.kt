@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moritoui.recordaccel.model.User
 import com.moritoui.recordaccel.model.UserKind
-import com.moritoui.recordaccel.usecases.GetSelfUserUseCase
 import com.moritoui.recordaccel.usecases.GetUserListUseCase
 import com.moritoui.recordaccel.usecases.IsRegisterUserUseCase
 import com.moritoui.recordaccel.usecases.LoadUserListUseCase
