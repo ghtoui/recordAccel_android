@@ -143,7 +143,6 @@ class MainScreenViewModel @Inject constructor(
     fun openSelfUserRegisterDialog() {
         _uiState.update {
             it.copy(isOpenSelfRegisterDialog = true)
-
         }
     }
 

@@ -227,7 +227,7 @@ fun MainUserList(
     ) {
         items(
             userList,
-            key = { item -> item.uuid}
+            key = { item -> item.uuid }
         ) { user ->
             key(user.uuid) {
                 ListElement(
@@ -405,7 +405,8 @@ fun ShowUserId(
         ) {
             Text(userId)
             Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = {
+            IconButton(
+                onClick = {
                 clipBoardManager.setText(AnnotatedString(userId))
                 onCopyButtonClick()
             }
@@ -559,36 +560,6 @@ fun UserAddButton(
         }
     }
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//fun BottomSheetPreview() {
-//    val scope = rememberCoroutineScope()
-//    val snackBarHostState = remember { SnackbarHostState() }
-//    Scaffold(
-//        topBar = {
-//            MainScreenTopBar(
-//                isEdit = false,
-//                onEditButtonClick = {}
-//            )
-//        },
-//        snackbarHost = {
-//            SnackbarHost(hostState = snackBarHostState)
-//        }
-//    ) { innerPadding ->
-//        ShowUserId(
-//            clipBoardManager = LocalClipboardManager.current,
-//            userId = "${UUID.randomUUID()}",
-//            onCopyButtonClick = {
-//                scope.launch {
-//                    snackBarHostState.showSnackbar("copy!")
-//                }
-//            },
-//            modifier = Modifier
-//                .padding(innerPadding)
-//        )
-//    }
-//}
 
 @Preview(showBackground = true)
 @Composable
