@@ -29,6 +29,6 @@
 |moshi                |JSON parse            |
 |Preferences DataStore|ユーザデータの永続化  |
 |FOREGROUND SERVICE   |継続的なセンサ情報収集|
-|MondoDB              |データベース          |
+|MongoDB              |データベース          |
 |Deno Deploy          |クラウド              |
 |                     |                      |
