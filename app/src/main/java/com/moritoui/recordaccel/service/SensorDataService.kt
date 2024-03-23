@@ -54,8 +54,8 @@ class SensorDataService @Inject constructor() : Service() {
             this,
             BuildConfig.FOREGROUND_SENSOR_CHANNEL_NAME
         ).setContentTitle("見守り中")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .addAction(R.drawable.ic_launcher_foreground, "停止する", sendPendingIntent)
+            .setSmallIcon(R.drawable.groups)
+            .addAction(R.drawable.groups, "停止する", sendPendingIntent)
             .build()
         startForeground(CHANNEL_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
     }
@@ -77,8 +77,8 @@ class SensorDataService @Inject constructor() : Service() {
             this,
             BuildConfig.FOREGROUND_SENSOR_CHANNEL_NAME
         ).setContentTitle("見守り停止中")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .addAction(R.drawable.ic_launcher_foreground, "再開する", sendPendingIntent)
+            .setSmallIcon(R.drawable.groups)
+            .addAction(R.drawable.groups, "再開する", sendPendingIntent)
             .build()
 
         val notificationManager = this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

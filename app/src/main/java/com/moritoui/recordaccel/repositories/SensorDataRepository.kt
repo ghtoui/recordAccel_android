@@ -92,7 +92,7 @@ class SensorDataRepositoryImpl @Inject constructor(
                     accData = it.resultAcc,
                     date = timeManager.dateToISOText(it.date)
                 )
-            }.takeLast(sumlizeCount)
+            }.takeLast(sumlizeCount )
             clearSumlizeCount()
             accelApi.postAccData(body = postAccData)
         } catch (error: Exception) {
