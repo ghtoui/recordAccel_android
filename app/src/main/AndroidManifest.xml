@@ -35,6 +35,13 @@
         <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
             android:value="always sensor collect" />
         </service>
+        <service
+            android:name=".service.PushNotificationService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
         <receiver android:name=".service.SensorBroadCastReceiver" android:exported="false" />
     </application>
 
