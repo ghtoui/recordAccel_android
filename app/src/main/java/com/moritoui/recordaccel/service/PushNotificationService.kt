@@ -12,7 +12,7 @@ import com.moritoui.recordaccel.BuildConfig
 import com.moritoui.recordaccel.MainActivity
 import com.moritoui.recordaccel.R
 
-class PushNotificationService: FirebaseMessagingService() {
+class PushNotificationService : FirebaseMessagingService() {
     companion object {
         const val CHANNEL_ID = 2
         @DrawableRes var NOTIFICATION_ICON: Int = R.drawable.groups
