@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
         // 多分今はActivityResultで行う？
         val requestPermissionLauncher =
             registerForActivityResult(
-                ActivityResultContracts.RequestPermission()
+                ActivityResultContracts.RequestPermission(),
             ) { isGranted: Boolean ->
                 if (isGranted) {
                 } else {
@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
             }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestPermissionLauncher.launch(
-                Manifest.permission.POST_NOTIFICATIONS
+                Manifest.permission.POST_NOTIFICATIONS,
             )
         }
         startForegroundService(intent)
@@ -46,10 +46,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             RecordAccelTheme {
                 Surface(
-                    color = MaterialTheme.colorScheme.background
+                    color = MaterialTheme.colorScheme.background,
                 ) {
                     Navigation(
-                        modifier = Modifier.safeDrawingPadding()
+                        modifier = Modifier.safeDrawingPadding(),
                     )
                 }
             }

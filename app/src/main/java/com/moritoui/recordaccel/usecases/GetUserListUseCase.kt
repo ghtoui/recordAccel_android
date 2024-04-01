@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 class GetUserListUseCase @Inject constructor(
-    private val userListDataRepository: UserListDataRepository
+    private val userListDataRepository: UserListDataRepository,
 ) {
     operator fun invoke(): StateFlow<List<User>> {
         return userListDataRepository.userList

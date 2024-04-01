@@ -35,8 +35,8 @@ class MotionSensor @Inject constructor(
         accDataList.add(
             AccData(
                 resultAcc = resultAcc,
-                date = LocalDateTime.now()
-            )
+                date = LocalDateTime.now(),
+            ),
         )
     }
 

@@ -1,12 +1,11 @@
 package com.moritoui.recordaccel.ui
 
-import android.content.res.Configuration.UI_MODE_NIGHT_NO
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.graphics.PointF
 import android.util.Log
 import android.view.MotionEvent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -44,12 +44,15 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.moritoui.recordaccel.R
 import com.moritoui.recordaccel.model.AccData
 import com.moritoui.recordaccel.model.AccDataList
 import com.moritoui.recordaccel.model.TimeManager
@@ -61,7 +64,7 @@ private val timeManager: TimeManager = TimeManager()
 
 @Composable
 fun DetailScreen(
-    viewModel: DetailScreenViewModel = hiltViewModel()
+    viewModel: DetailScreenViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -70,12 +73,12 @@ fun DetailScreen(
             selectTimeTerm = uiState.selectTimeTerm,
             onClickTerm = { viewModel.selectTimeTerm(it) },
             modifier = Modifier
-                .height(50.dp)
+                .height(50.dp),
         )
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height((LocalConfiguration.current.screenHeightDp / 3).dp)
+                .height((LocalConfiguration.current.screenHeightDp / 2.5).dp),
         ) {
             AccChartView(
                 accDataList = uiState.accDataList,
@@ -85,12 +88,12 @@ fun DetailScreen(
                 xAxisEnd = uiState.xEnd,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
+                    .padding(8.dp),
             )
             if (uiState.isLoading) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     CircularProgressIndicator()
                 }
@@ -103,7 +106,8 @@ fun DetailScreen(
                     viewModel.updateSelectedDatetime(it)
                 }
             },
-            modifier = Modifier.weight(1f)
+            modifier = Modifier
+                .weight(1f),
         )
     }
 }
@@ -116,7 +120,7 @@ fun AccChartView(
     maxValue: Double,
     xAxisStart: Long,
     xAxisEnd: Long,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     if (accDataList.isEmpty()) {
         return
@@ -125,76 +129,136 @@ fun AccChartView(
     val zeroPoints: MutableList<Offset> = mutableListOf()
 
     val textMeasurer = rememberTextMeasurer()
+    val pointSize = 30.toFloat()
 
-    Canvas(
-        modifier = modifier
-            .pointerInteropFilter { motionEvent: MotionEvent ->
-                when (motionEvent.action) {
-                    MotionEvent.ACTION_DOWN -> {
-                        Log.d("action", "tap")
-                    }
-                    MotionEvent.ACTION_MOVE -> {
-                        Log.d("action", "move")
-                    }
-                    MotionEvent.ACTION_UP -> {
-                        Log.d("action", "up")
-                    }
-                    else -> return@pointerInteropFilter false
-                }
-                true
-            }
+    Box(
+        modifier = modifier,
     ) {
-        val resultAccPath = Path()
-        accDataList.forEachIndexed { index, accData ->
-            val resultAccPathXY = getChartPath(
-                canvasWidthSize = size.width,
-                canvasHeightSize = size.height - 60,
-                value = accData.resultAcc,
-                maxValue = maxValue,
-                minValue = minValue,
-                time = timeManager.dateToEpochTime(accData.date),
-                xAxisStart = xAxisStart,
-                xAxisEnd = xAxisEnd
+        Canvas(
+            modifier = Modifier
+                .fillMaxSize()
+                .pointerInteropFilter { motionEvent: MotionEvent ->
+                    when (motionEvent.action) {
+                        MotionEvent.ACTION_DOWN -> {
+                            Log.d("action", "tap")
+                        }
+
+                        MotionEvent.ACTION_MOVE -> {
+                            Log.d("action", "move")
+                        }
+
+                        MotionEvent.ACTION_UP -> {
+                            Log.d("action", "up")
+                        }
+
+                        else -> return@pointerInteropFilter false
+                    }
+                    true
+                },
+        ) {
+            val resultAccPath = Path()
+            accDataList.forEachIndexed { index, accData ->
+                val resultAccPathXY = getChartPath(
+                    canvasWidthSize = size.width,
+                    canvasHeightSize = size.height - 60,
+                    value = accData.resultAcc,
+                    maxValue = maxValue,
+                    minValue = minValue,
+                    time = timeManager.dateToEpochTime(accData.date),
+                    xAxisStart = xAxisStart,
+                    xAxisEnd = xAxisEnd,
+                )
+
+                when (accData.resultAcc) {
+                    in 0.0..0.2 -> zeroPoints.add(Offset(resultAccPathXY.x, resultAccPathXY.y))
+                    else -> points.add(Offset(resultAccPathXY.x, resultAccPathXY.y))
+                }
+                when (index) {
+                    0 -> {
+                        resultAccPath.moveTo(resultAccPathXY.x, resultAccPathXY.y)
+                    }
+
+                    else -> {
+                        resultAccPath.lineTo(resultAccPathXY.x, resultAccPathXY.y)
+                    }
+                }
+            }
+            //        drawText(
+            //            topLeft = Offset(size.width, size.height),
+            //            topLeft = Offset(600.toFloat(), size.height - 40),
+            //            style = TextStyle.Default,
+            //            textMeasurer = textMeasurer,
+            //            text = "aaaaaaaaaa"
+            //        )
+
+            drawPoints(
+                points = points,
+                pointMode = PointMode.Points,
+                color = Color.Black,
+                strokeWidth = pointSize,
             )
-
-            when (accData.resultAcc) {
-                in 0.0..0.5 -> zeroPoints.add(Offset(resultAccPathXY.x, resultAccPathXY.y))
-                else -> points.add(Offset(resultAccPathXY.x, resultAccPathXY.y))
-            }
-            when (index) {
-                0 -> {
-                    resultAccPath.moveTo(resultAccPathXY.x, resultAccPathXY.y)
-                }
-                else -> {
-                    resultAccPath.lineTo(resultAccPathXY.x, resultAccPathXY.y)
-                }
-            }
+            drawPoints(
+                points = zeroPoints,
+                pointMode = PointMode.Points,
+                color = Color.Red,
+                strokeWidth = pointSize,
+            )
+            //        drawPath(
+            //            path = resultAccPath,
+            //            color = Color.Black,
+            //            style = Stroke(8f)
+            //        )
         }
-//        drawText(
-//            topLeft = Offset(size.width, size.height),
-//            topLeft = Offset(600.toFloat(), size.height - 40),
-//            style = TextStyle.Default,
-//            textMeasurer = textMeasurer,
-//            text = "aaaaaaaaaa"
-//        )
 
-        drawPoints(
-            points = points,
-            pointMode = PointMode.Points,
-            color = Color.Black,
-            strokeWidth = 30.toFloat()
+        DrawLabel(
+            modifier = Modifier
+                .align(Alignment.TopEnd),
         )
-        drawPoints(
-            points = zeroPoints,
-            pointMode = PointMode.Points,
-            color = Color.Red,
-            strokeWidth = 30.toFloat()
-        )
-//        drawPath(
-//            path = resultAccPath,
-//            color = Color.Black,
-//            style = Stroke(8f)
-//        )
+    }
+}
+
+@Composable
+fun DrawLabel(
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .border(
+                color = Color.DarkGray,
+                width = 1.dp,
+            )
+            .background(Color.White)
+            .padding(horizontal = 8.dp),
+        verticalArrangement = Arrangement.SpaceAround,
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(12.dp)
+                    .background(Color.Black),
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                "動いた",
+                modifier = Modifier,
+            )
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(12.dp)
+                    .background(Color.Red),
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                "動かなかった",
+                modifier = Modifier,
+            )
+        }
     }
 }
 
@@ -206,7 +270,7 @@ fun getChartPath(
     minValue: Double,
     time: Long,
     xAxisStart: Long,
-    xAxisEnd: Long
+    xAxisEnd: Long,
 ): PointF {
     val width = canvasWidthSize
     val height = canvasHeightSize
@@ -228,14 +292,14 @@ fun getChartPath(
 fun DateList(
     dateList: MutableList<String>,
     onClickDateTimeElement: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     if (dateList.isEmpty()) {
         return
     }
     var selectedDate: String? by rememberSaveable { mutableStateOf(dateList.last()) }
     LazyColumn(
-        modifier = modifier
+        modifier = modifier,
     ) {
         items(dateList.asReversed()) { date ->
             DateListElement(
@@ -250,7 +314,7 @@ fun DateList(
                 isSelected = when (selectedDate) {
                     date -> true
                     else -> false
-                }
+                },
             )
         }
     }
@@ -261,17 +325,17 @@ fun DateListElement(
     text: String,
     isSelected: Boolean,
     onClickDateTimeElement: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Card(
         elevation = CardDefaults.elevatedCardElevation(
-            defaultElevation = 8.dp
+            defaultElevation = 8.dp,
         ),
         modifier = modifier
             .fillMaxWidth()
             .height(100.dp)
             .padding(10.dp)
-            .clickable { onClickDateTimeElement(text) }
+            .clickable { onClickDateTimeElement(text) },
     ) {
         Box(
             modifier = Modifier
@@ -280,14 +344,14 @@ fun DateListElement(
                     when (isSelected) {
                         true -> MaterialTheme.colorScheme.primaryContainer
                         false -> Color.Unspecified
-                    }
+                    },
                 ),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Text(
                 text,
                 textAlign = TextAlign.Center,
-                fontSize = 24.sp
+                fontSize = 24.sp,
             )
         }
     }
@@ -297,12 +361,12 @@ fun DateListElement(
 fun DateTimeRangeChangeButton(
     selectTimeTerm: TimeTerm,
     onClickTerm: (TimeTerm) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth(),
-        horizontalArrangement = Arrangement.End
+        horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
         TimeTerm.values().forEach {
             OutlinedButton(
@@ -312,17 +376,22 @@ fun DateTimeRangeChangeButton(
                 colors = when (selectTimeTerm) {
                     it -> ButtonDefaults.buttonColors()
                     else -> ButtonDefaults.outlinedButtonColors()
-                }
+                },
             ) {
                 Text(
-                    it.text
+                    stringResource(R.string.date_change_buttontext, it.text),
                 )
             }
-            Spacer(modifier = Modifier.width(8.dp))
         }
     }
 }
 
+@Preview(name = "mdpi", widthDp = 360, heightDp = 640)
+@Preview(name = "hdpi", widthDp = 540, heightDp = 960)
+@Preview(name = "xhdpi", device = Devices.NEXUS_7)
+@Preview(name = "xxhdpi", device = Devices.NEXUS_5)
+@Preview(name = "xxxhdpi", device = Devices.PIXEL_4_XL)
+@Preview(widthDp = 340, heightDp = 560, showBackground = true)
 @Composable
 fun DetailScreenPreview() {
     val timeManager = TimeManager()
@@ -337,7 +406,7 @@ fun DetailScreenPreview() {
     }
     RecordAccelTheme {
         Surface(
-            color = MaterialTheme.colorScheme.background
+            color = MaterialTheme.colorScheme.background,
         ) {
             Column {
 //                DateTimeRangeChangeButton(
@@ -346,6 +415,12 @@ fun DetailScreenPreview() {
 //                    modifier = Modifier
 //                        .height(50.dp)
 //                )
+                DateTimeRangeChangeButton(
+                    selectTimeTerm = TimeTerm.Day,
+                    onClickTerm = { },
+                    modifier = Modifier
+                        .height(50.dp),
+                )
                 AccChartView(
                     accDataList = accDataList.toMutableList(),
                     minValue = accDataList.minOf { it.resultAcc },
@@ -356,6 +431,7 @@ fun DetailScreenPreview() {
                         .fillMaxWidth()
                         .height((LocalConfiguration.current.screenHeightDp / 3).dp)
                         .padding(16.dp)
+                        .background(Color.LightGray),
                 )
 //                DateList(
 //                    dateList = dateList.reversed().toMutableList(),
@@ -365,22 +441,4 @@ fun DetailScreenPreview() {
             }
         }
     }
-}
-
-@Preview(
-    showBackground = true,
-    uiMode = UI_MODE_NIGHT_NO
-)
-@Composable
-fun DetailScreenPreviewLight() {
-    DetailScreenPreview()
-}
-
-@Preview(
-    showBackground = true,
-    uiMode = UI_MODE_NIGHT_YES
-)
-@Composable
-fun DetailScreenPreviewDark() {
-    DetailScreenPreview()
 }

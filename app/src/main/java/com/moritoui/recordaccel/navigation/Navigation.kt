@@ -11,7 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import com.moritoui.recordaccel.ui.DetailScreen
 
 sealed class Screen(
-    val route: String
+    val route: String,
 ) {
     object MainScreen : Screen("mainScreen")
     object DetailScreen : Screen("detailScreen")
@@ -20,22 +20,22 @@ sealed class Screen(
 @Composable
 fun Navigation(
     modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
 ) {
     NavHost(
         modifier = modifier,
         navController = navController,
-        startDestination = Screen.MainScreen.route
+        startDestination = Screen.MainScreen.route,
     ) {
         composable(Screen.MainScreen.route) {
             MainScreen(
                 viewModel = hiltViewModel(),
-                popUp = { navController.navigate(Screen.DetailScreen.route) }
+                popUp = { navController.navigate(Screen.DetailScreen.route) },
             )
         }
         composable(Screen.DetailScreen.route) {
             DetailScreen(
-                viewModel = hiltViewModel()
+                viewModel = hiltViewModel(),
             )
         }
     }

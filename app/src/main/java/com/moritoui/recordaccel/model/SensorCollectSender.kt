@@ -15,7 +15,7 @@ private var sumlizeAccDateJob: Job? = null
 class SensorCollectSender @Inject constructor(
     private val getSelfUserUseCase: GetSelfUserUseCase,
     private val updateAccDataListUseCase: UpdateAccDataListUseCase,
-    private val sumlizeAccDataUseCase: SumlizeAccDataUseCase
+    private val sumlizeAccDataUseCase: SumlizeAccDataUseCase,
 ) {
     var isCollect = true
 
