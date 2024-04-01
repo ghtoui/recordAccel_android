@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "936324208851",
+    "project_id": "moriproject-1e194",
+    "storage_bucket": "moriproject-1e194.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:936324208851:android:a5e5cacef1bf2af2801c26",
+        "android_client_info": {
+          "package_name": "com.moritoui.recordaccel"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGPrizzB1JK2E4hrTjI1U2U6g2M1xCe2Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
