@@ -1,3 +1,2 @@
-root = true
 [*.{kt,kts}]
-disabled_rules = import-ordering
+ktlint_standard_annotation = disabled

@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 enum class ForegroundState {
     START,
-    STOP
+    STOP,
 }
 
 @AndroidEntryPoint
@@ -48,11 +48,11 @@ class SensorDataService @Inject constructor() : Service() {
             this,
             0,
             sendIntent,
-            PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_IMMUTABLE,
         )
         val notification = NotificationCompat.Builder(
             this,
-            BuildConfig.FOREGROUND_SENSOR_CHANNEL_NAME
+            BuildConfig.FOREGROUND_SENSOR_CHANNEL_NAME,
         ).setContentTitle("見守り中")
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .addAction(R.drawable.ic_launcher_foreground, "停止する", sendPendingIntent)
@@ -64,18 +64,19 @@ class SensorDataService @Inject constructor() : Service() {
         sensorCollectSender.isCollect = false
         val sendIntent = Intent(
             this,
-            SensorBroadCastReceiver::class.java
+            SensorBroadCastReceiver::class.java,
         ).apply {
             action = ForegroundState.START.name
         }
         val sendPendingIntent = PendingIntent.getBroadcast(
             this,
-            0, sendIntent,
-            PendingIntent.FLAG_IMMUTABLE
+            0,
+            sendIntent,
+            PendingIntent.FLAG_IMMUTABLE,
         )
         val notification = NotificationCompat.Builder(
             this,
-            BuildConfig.FOREGROUND_SENSOR_CHANNEL_NAME
+            BuildConfig.FOREGROUND_SENSOR_CHANNEL_NAME,
         ).setContentTitle("見守り停止中")
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .addAction(R.drawable.ic_launcher_foreground, "再開する", sendPendingIntent)

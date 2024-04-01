@@ -16,7 +16,7 @@ data class AccDataJson(
     @Json(name = "date")
     val date: String,
     @Json(name = "accData")
-    val accData: Double
+    val accData: Double,
 )
 
 @JsonClass(generateAdapter = true)
@@ -26,5 +26,5 @@ data class PostAccData(
     @Json(name = "accData")
     val accData: Double,
     @Json(name = "date")
-    val date: String
+    val date: String,
 )

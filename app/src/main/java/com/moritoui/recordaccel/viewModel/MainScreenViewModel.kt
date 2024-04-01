@@ -11,7 +11,6 @@ import com.moritoui.recordaccel.usecases.RegisterUserDataStoreUseCase
 import com.moritoui.recordaccel.usecases.RemoveUserDataStoreUseCase
 import com.moritoui.recordaccel.usecases.SetSelectedUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.util.UUID
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,6 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
 
 data class MainScreenUiState(
@@ -33,7 +33,7 @@ data class MainScreenUiState(
     val isSearchUserError: Boolean = false,
     val isOpenBottomSheet: Boolean = false,
     val selfUserId: String? = null,
-    val isEdit: Boolean = false
+    val isEdit: Boolean = false,
 )
 
 @HiltViewModel
@@ -64,13 +64,13 @@ class MainScreenViewModel @Inject constructor(
             User(
                 userId = UUID.randomUUID().toString(),
                 userKind = UserKind.Self,
-                userName = _uiState.value.selfNameInputText
+                userName = _uiState.value.selfNameInputText,
             )
         } else {
             User(
                 userId = _uiState.value.idInputText,
                 userKind = UserKind.Other,
-                userName = _uiState.value.otherNameInputText
+                userName = _uiState.value.otherNameInputText,
             )
         }
         // 連打できないように
@@ -113,7 +113,7 @@ class MainScreenViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 isRegisterUser = inputSelfNameText.isNotEmpty(),
-                selfNameInputText = inputSelfNameText
+                selfNameInputText = inputSelfNameText,
             )
         }
     }
@@ -122,7 +122,7 @@ class MainScreenViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 idInputText = inputIdText,
-                isRegisterUser = checkUUID(inputIdText) && _uiState.value.otherNameInputText.isNotEmpty()
+                isRegisterUser = checkUUID(inputIdText) && _uiState.value.otherNameInputText.isNotEmpty(),
             )
         }
     }
@@ -152,7 +152,7 @@ class MainScreenViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 isOpenSelfRegisterDialog = false,
-                isOpenOtherRegisterDialog = false
+                isOpenOtherRegisterDialog = false,
             )
         }
         resetRegisterUiState()
@@ -166,7 +166,7 @@ class MainScreenViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 selfUserId = userList.value.firstOrNull { it.userKind == UserKind.Self }?.userId,
-                isOpenBottomSheet = true
+                isOpenBottomSheet = true,
             )
         }
     }
@@ -180,7 +180,7 @@ class MainScreenViewModel @Inject constructor(
     fun changeEditState(changeEditState: Boolean) {
         _uiState.update {
             it.copy(
-                isEdit = changeEditState
+                isEdit = changeEditState,
             )
         }
     }
@@ -200,7 +200,7 @@ class MainScreenViewModel @Inject constructor(
                 isRegisterUser = false,
                 idInputText = "",
                 otherNameInputText = "",
-                selfNameInputText = ""
+                selfNameInputText = "",
             )
         }
         updateRegisterLoadingState(false)
@@ -210,7 +210,7 @@ class MainScreenViewModel @Inject constructor(
     private fun updateRegisterLoadingState(isLoading: Boolean) {
         _uiState.update {
             it.copy(
-                isRegisterLoading = isLoading
+                isRegisterLoading = isLoading,
             )
         }
     }
@@ -218,7 +218,7 @@ class MainScreenViewModel @Inject constructor(
     private fun updateSearchUserErrorState(isSearchError: Boolean) {
         _uiState.update {
             it.copy(
-                isSearchUserError = isSearchError
+                isSearchUserError = isSearchError,
             )
         }
     }

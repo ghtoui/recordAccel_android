@@ -29,10 +29,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             RecordAccelTheme {
                 Surface(
-                    color = MaterialTheme.colorScheme.background
+                    color = MaterialTheme.colorScheme.background,
                 ) {
                     Navigation(
-                        modifier = Modifier.safeDrawingPadding()
+                        modifier = Modifier.safeDrawingPadding(),
                     )
                 }
             }

@@ -4,5 +4,5 @@ import java.time.LocalDateTime
 
 data class AccData(
     val resultAcc: Double,
-    val date: LocalDateTime
+    val date: LocalDateTime,
 )

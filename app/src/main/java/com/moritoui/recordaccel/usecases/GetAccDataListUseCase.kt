@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 class GetAccDataListUseCase @Inject constructor(
-    private val sensorDataRepository: SensorDataRepository
+    private val sensorDataRepository: SensorDataRepository,
 ) {
     operator fun invoke(userKind: UserKind?, selectedDate: String?): MutableList<AccData> {
         val accDataList = sensorDataRepository.accDataList

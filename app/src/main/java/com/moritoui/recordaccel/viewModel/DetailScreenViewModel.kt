@@ -10,9 +10,6 @@ import com.moritoui.recordaccel.usecases.GetAccDateListUseCase
 import com.moritoui.recordaccel.usecases.GetApiAccelDataUseCase
 import com.moritoui.recordaccel.usecases.GetSelectedUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,6 +17,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 data class DetailScreenUiState(
@@ -31,7 +31,7 @@ data class DetailScreenUiState(
     val isLoading: Boolean,
     val selectTimeTerm: TimeTerm = TimeTerm.Day,
     val xStart: Long = 0,
-    val xEnd: Long = 0
+    val xEnd: Long = 0,
 )
 
 @HiltViewModel
@@ -62,7 +62,7 @@ class DetailScreenViewModel @Inject constructor(
                     val getAsyncDateList = async {
                         getDateListUseCase(
                             pageNumber = 0,
-                            dateList = _uiState.value.dateList
+                            dateList = _uiState.value.dateList,
                         )
                     }
                     val accDateList = getAsyncDateList.await()
@@ -103,7 +103,7 @@ class DetailScreenViewModel @Inject constructor(
     private fun updateDateList(accDataList: MutableList<String>) {
         _uiState.update {
             it.copy(
-                dateList = accDataList
+                dateList = accDataList,
             )
         }
     }
@@ -127,7 +127,7 @@ class DetailScreenViewModel @Inject constructor(
     private fun updateIsLoading(isLoading: Boolean) {
         _uiState.update {
             it.copy(
-                isLoading = isLoading
+                isLoading = isLoading,
             )
         }
     }
@@ -177,7 +177,7 @@ class DetailScreenViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 xStart = xAxis.first,
-                xEnd = xAxis.second
+                xEnd = xAxis.second,
             )
         }
     }
@@ -190,7 +190,7 @@ class DetailScreenViewModel @Inject constructor(
                 selectedDateTime = selectedDateTime,
                 minValue = 0.0,
                 maxValue = 0.0,
-                selectTimeTerm = TimeTerm.Day
+                selectTimeTerm = TimeTerm.Day,
             )
         }
         viewModelScope.launch {
@@ -203,7 +203,7 @@ class DetailScreenViewModel @Inject constructor(
     fun selectTimeTerm(selectTimeTerm: TimeTerm) {
         _uiState.update {
             it.copy(
-                selectTimeTerm = selectTimeTerm
+                selectTimeTerm = selectTimeTerm,
             )
         }
         selectReload()

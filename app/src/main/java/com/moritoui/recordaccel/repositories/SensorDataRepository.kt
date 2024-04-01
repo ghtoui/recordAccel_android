@@ -48,8 +48,8 @@ class SensorDataRepositoryImpl @Inject constructor(
         tempAccDataList.add(
             AccData(
                 resultAcc = accDataList.sumOf { it.resultAcc } / accDataList.size,
-                date = accDataList.first().date
-            )
+                date = accDataList.first().date,
+            ),
         )
         motionSensor.clearAccDataList()
         this.sumlizeCount += 1
@@ -73,7 +73,7 @@ class SensorDataRepositoryImpl @Inject constructor(
                 apiAccDataList = accJsonData.first().accDatas.map {
                     AccData(
                         resultAcc = it.accData,
-                        date = LocalDateTime.parse(it.date.dropLast(1))
+                        date = LocalDateTime.parse(it.date.dropLast(1)),
                     )
                 }.toMutableList()
             }
@@ -90,7 +90,7 @@ class SensorDataRepositoryImpl @Inject constructor(
                 PostAccData(
                     userId = selfUser.userId,
                     accData = it.resultAcc,
-                    date = timeManager.dateToISOText(it.date)
+                    date = timeManager.dateToISOText(it.date),
                 )
             }.takeLast(sumlizeCount)
             clearSumlizeCount()

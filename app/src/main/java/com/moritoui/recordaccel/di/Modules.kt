@@ -65,7 +65,7 @@ object Modules {
         return PreferenceDataStoreFactory.create(
             produceFile = {
                 context.preferencesDataStoreFile("user_list")
-            }
+            },
         )
     }
 
@@ -73,7 +73,7 @@ object Modules {
     @Singleton
     fun provideUserListDataRepository(
         dataStore: DataStore<Preferences>,
-        moshi: Moshi
+        moshi: Moshi,
     ): UserListDataRepository {
         return UserListDataRepositoryImpl(dataStore, moshi.adapter<MutableList<User>>(Types.newParameterizedType(MutableList::class.java, User::class.java)))
     }
@@ -124,12 +124,12 @@ object Modules {
     fun provideSensorCollectSender(
         getSelfUserUseCase: GetSelfUserUseCase,
         updateAccDataListUseCase: UpdateAccDataListUseCase,
-        sumlizeAccDataUseCase: SumlizeAccDataUseCase
+        sumlizeAccDataUseCase: SumlizeAccDataUseCase,
     ): SensorCollectSender {
         return SensorCollectSender(
             getSelfUserUseCase,
             updateAccDataListUseCase,
-            sumlizeAccDataUseCase
+            sumlizeAccDataUseCase,
         )
     }
 }

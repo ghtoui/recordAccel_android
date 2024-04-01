@@ -6,7 +6,7 @@ import javax.inject.Inject
 
 class GetSelfUserUseCase @Inject constructor(
     private val loadUserListUseCase: LoadUserListUseCase,
-    private val getUserListUseCase: GetUserListUseCase
+    private val getUserListUseCase: GetUserListUseCase,
 ) {
     suspend operator fun invoke(): User? {
         loadUserListUseCase()

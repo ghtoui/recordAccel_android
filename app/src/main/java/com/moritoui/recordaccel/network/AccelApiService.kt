@@ -12,22 +12,22 @@ interface AccelApiService {
     @GET("/date")
     suspend fun getAccDateList(
         @Query("userId") userId: String,
-        @Query("pageNumber") pageNumber: Int
+        @Query("pageNumber") pageNumber: Int,
     ): Response<List<String>>
 
     @GET("/")
     suspend fun getAccDataList(
         @Query("userId") userId: String,
-        @Query("date") date: String
+        @Query("date") date: String,
     ): Response<List<AccDataJsonData>>
 
     @GET("/checkUser")
     suspend fun searchUser(
-        @Query("userId") userId: String
+        @Query("userId") userId: String,
     ): Response<Boolean>
 
     @POST("/")
     suspend fun postAccData(
-        @Body body: List<PostAccData>
+        @Body body: List<PostAccData>,
     )
 }

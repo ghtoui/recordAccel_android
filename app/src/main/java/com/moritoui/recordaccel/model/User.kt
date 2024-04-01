@@ -13,10 +13,10 @@ data class User(
     @Json(name = "user_kind")
     val userKind: UserKind,
     @Json(ignore = true)
-    val uuid: UUID = UUID.randomUUID()
+    val uuid: UUID = UUID.randomUUID(),
 )
 
 enum class UserKind {
     Self,
-    Other
+    Other,
 }
