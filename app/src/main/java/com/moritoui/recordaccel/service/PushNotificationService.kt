@@ -15,6 +15,7 @@ import com.moritoui.recordaccel.R
 class PushNotificationService : FirebaseMessagingService() {
     companion object {
         const val CHANNEL_ID = 2
+
         @DrawableRes var NOTIFICATION_ICON: Int = R.drawable.groups
     }
 
@@ -25,7 +26,7 @@ class PushNotificationService : FirebaseMessagingService() {
         val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_MUTABLE)
         val notification = NotificationCompat.Builder(
             this,
-            BuildConfig.FOREGROUND_SENSOR_CHANNEL_NAME
+            BuildConfig.FOREGROUND_SENSOR_CHANNEL_NAME,
         ).setSmallIcon(NOTIFICATION_ICON)
             .setContentTitle(remoteMessage.notification!!.title)
             .setContentText(remoteMessage.notification!!.body).setAutoCancel(true)
@@ -34,7 +35,7 @@ class PushNotificationService : FirebaseMessagingService() {
         val channel = NotificationChannel(
             BuildConfig.FOREGROUND_SENSOR_CHANNEL_NAME,
             "Firebase messaging channel",
-            NotificationManager.IMPORTANCE_DEFAULT
+            NotificationManager.IMPORTANCE_DEFAULT,
         )
         val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         manager.createNotificationChannel(channel)

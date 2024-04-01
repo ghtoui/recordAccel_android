@@ -26,6 +26,7 @@ class SensorDataService @Inject constructor() : Service() {
     @Inject lateinit var sensorCollectSender: SensorCollectSender
     companion object {
         const val CHANNEL_ID = 1
+
         @DrawableRes var NOTIFICATION_ICON: Int = R.drawable.groups
     }
 
