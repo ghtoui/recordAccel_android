@@ -59,8 +59,7 @@ import com.moritoui.recordaccel.model.TimeManager
 import com.moritoui.recordaccel.model.TimeTerm
 import com.moritoui.recordaccel.ui.theme.RecordAccelTheme
 import com.moritoui.recordaccel.viewModel.DetailScreenViewModel
-
-private val timeManager: TimeManager = TimeManager()
+import java.time.LocalDateTime
 
 @Composable
 fun DetailScreen(
@@ -75,6 +74,12 @@ fun DetailScreen(
             modifier = Modifier
                 .height(50.dp),
         )
+        ShowTapDataInformation(
+            accData = uiState.selectData,
+            dateToText = { viewModel.getDateLabelText() },
+            modifier = Modifier
+                .padding(16.dp)
+        )
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -86,6 +91,7 @@ fun DetailScreen(
                 maxValue = uiState.maxValue,
                 xAxisStart = uiState.xStart,
                 xAxisEnd = uiState.xEnd,
+                convertDateToDate = { viewModel.convertDateToTime(it) },
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(8.dp),
@@ -120,6 +126,7 @@ fun AccChartView(
     maxValue: Double,
     xAxisStart: Long,
     xAxisEnd: Long,
+    convertDateToDate: (LocalDateTime) -> Long,
     modifier: Modifier = Modifier,
 ) {
     if (accDataList.isEmpty()) {
@@ -141,10 +148,12 @@ fun AccChartView(
                     when (motionEvent.action) {
                         MotionEvent.ACTION_DOWN -> {
                             Log.d("action", "tap")
+                            Log.d("tap", "${motionEvent.x}, ${motionEvent.y}")
                         }
 
                         MotionEvent.ACTION_MOVE -> {
                             Log.d("action", "move")
+                            Log.d("move", "${motionEvent.x}, ${motionEvent.y}")
                         }
 
                         MotionEvent.ACTION_UP -> {
@@ -164,14 +173,14 @@ fun AccChartView(
                     value = accData.resultAcc,
                     maxValue = maxValue,
                     minValue = minValue,
-                    time = timeManager.dateToEpochTime(accData.date),
+                    time = convertDateToDate(accData.date),
                     xAxisStart = xAxisStart,
                     xAxisEnd = xAxisEnd,
                 )
 
-                when (accData.resultAcc) {
-                    in 0.0..0.2 -> zeroPoints.add(Offset(resultAccPathXY.x, resultAccPathXY.y))
-                    else -> points.add(Offset(resultAccPathXY.x, resultAccPathXY.y))
+                when (accData.isMove) {
+                    true -> zeroPoints.add(Offset(resultAccPathXY.x, resultAccPathXY.y))
+                    false -> points.add(Offset(resultAccPathXY.x, resultAccPathXY.y))
                 }
                 when (index) {
                     0 -> {
@@ -241,7 +250,7 @@ fun DrawLabel(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                "動いた",
+                stringResource(R.string.move_graph_label_text),
                 modifier = Modifier,
             )
         }
@@ -255,7 +264,7 @@ fun DrawLabel(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                "動かなかった",
+                stringResource(R.string.unmove_graph_label_text),
                 modifier = Modifier,
             )
         }
@@ -286,6 +295,45 @@ fun getChartPath(
     }
 
     return PointF(x, y.toFloat())
+}
+
+@Composable
+fun ShowTapDataInformation(
+    accData: AccData?,
+    dateToText: (LocalDateTime) -> String,
+    modifier: Modifier = Modifier
+) {
+    accData ?: return
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+    ) {
+        Text(
+            text = dateToText(accData.date)
+        )
+        Row(
+            modifier = Modifier,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(12.dp)
+                    .background(
+                        color = when (accData.isMove) {
+                            true -> Color.Black
+                            false -> Color.Red
+                        }
+                    ),
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                when (accData.isMove) {
+                    true -> stringResource(id = R.string.move_graph_label_text)
+                    false -> stringResource(id = R.string.unmove_graph_label_text)
+                }
+            )
+        }
+    }
 }
 
 @Composable
@@ -421,12 +469,19 @@ fun DetailScreenPreview() {
                     modifier = Modifier
                         .height(50.dp),
                 )
+                ShowTapDataInformation(
+                    accData = accDataList.first(),
+                    dateToText = { timeManager.dateToText(it) },
+                    modifier = Modifier
+                        .padding(16.dp)
+                )
                 AccChartView(
                     accDataList = accDataList.toMutableList(),
                     minValue = accDataList.minOf { it.resultAcc },
                     maxValue = accDataList.maxOf { it.resultAcc },
                     xAxisStart = xAxisStart,
                     xAxisEnd = xAxisEnd,
+                    convertDateToDate = { 0 },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height((LocalConfiguration.current.screenHeightDp / 3).dp)

@@ -10,6 +10,9 @@ import com.moritoui.recordaccel.usecases.GetAccDateListUseCase
 import com.moritoui.recordaccel.usecases.GetApiAccelDataUseCase
 import com.moritoui.recordaccel.usecases.GetSelectedUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,9 +20,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 data class DetailScreenUiState(
@@ -32,6 +32,7 @@ data class DetailScreenUiState(
     val selectTimeTerm: TimeTerm = TimeTerm.Day,
     val xStart: Long = 0,
     val xEnd: Long = 0,
+    val selectData: AccData? = null
 )
 
 @HiltViewModel
@@ -207,5 +208,18 @@ class DetailScreenViewModel @Inject constructor(
             )
         }
         selectReload()
+    }
+
+    fun getDateLabelText(): String {
+        val selectAccData = _uiState.value.selectData
+        return if (selectAccData != null) {
+            timeManager.dateToText(selectAccData.date)
+        } else {
+            ""
+        }
+    }
+
+    fun convertDateToTime(dateTime: LocalDateTime): Long {
+        return timeManager.dateToEpochTime(dateTime)
     }
 }
