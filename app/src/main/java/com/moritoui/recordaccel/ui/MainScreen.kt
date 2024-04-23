@@ -143,8 +143,7 @@ fun MainScreen(
         Column(
             modifier = modifier
                 .padding(innerPadding)
-                .fillMaxWidth(),
-            verticalArrangement = Arrangement.Center,
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             MainUserList(
