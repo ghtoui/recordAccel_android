@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -32,7 +33,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -47,8 +47,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -57,7 +55,9 @@ import com.moritoui.recordaccel.model.AccData
 import com.moritoui.recordaccel.model.AccDataList
 import com.moritoui.recordaccel.model.TimeManager
 import com.moritoui.recordaccel.model.TimeTerm
+import com.moritoui.recordaccel.preview.MultiDevicePreview
 import com.moritoui.recordaccel.ui.theme.RecordAccelTheme
+import com.moritoui.recordaccel.viewModel.DetailScreenUiState
 import com.moritoui.recordaccel.viewModel.DetailScreenViewModel
 import java.time.LocalDateTime
 
@@ -66,17 +66,34 @@ fun DetailScreen(
     viewModel: DetailScreenViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    DetailScreen(
+        uiState = uiState,
+        onClickTerm = viewModel::selectTimeTerm,
+        dateToText = viewModel::getDateLabelText,
+        convertDateToDate = viewModel::convertDateToTime,
+        onClickDateTimeElement = viewModel::updateSelectedDatetime
+    )
+}
 
+@Composable
+private fun DetailScreen(
+    uiState: DetailScreenUiState,
+    onClickTerm: (TimeTerm) -> Unit,
+    dateToText: () -> String,
+    convertDateToDate: (LocalDateTime) -> Long,
+    onClickDateTimeElement: (String) -> Unit
+) {
     Column {
         DateTimeRangeChangeButton(
             selectTimeTerm = uiState.selectTimeTerm,
-            onClickTerm = { viewModel.selectTimeTerm(it) },
+            onClickTerm = onClickTerm,
             modifier = Modifier
-                .height(50.dp),
+                .fillMaxWidth()
+                .defaultMinSize(minHeight = 50.dp),
         )
         ShowTapDataInformation(
             accData = uiState.selectData,
-            dateToText = { viewModel.getDateLabelText() },
+            dateToText = dateToText,
             modifier = Modifier
                 .padding(16.dp)
         )
@@ -91,7 +108,7 @@ fun DetailScreen(
                 maxValue = uiState.maxValue,
                 xAxisStart = uiState.xStart,
                 xAxisEnd = uiState.xEnd,
-                convertDateToDate = { viewModel.convertDateToTime(it) },
+                convertDateToDate = convertDateToDate,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(8.dp),
@@ -107,11 +124,7 @@ fun DetailScreen(
         }
         DateList(
             dateList = uiState.dateList,
-            onClickDateTimeElement = remember {
-                {
-                    viewModel.updateSelectedDatetime(it)
-                }
-            },
+            onClickDateTimeElement = onClickDateTimeElement,
             modifier = Modifier
                 .weight(1f),
         )
@@ -121,7 +134,7 @@ fun DetailScreen(
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun AccChartView(
-    accDataList: MutableList<AccData>,
+    accDataList: List<AccData>,
     minValue: Double,
     maxValue: Double,
     xAxisStart: Long,
@@ -300,7 +313,7 @@ fun getChartPath(
 @Composable
 fun ShowTapDataInformation(
     accData: AccData?,
-    dateToText: (LocalDateTime) -> String,
+    dateToText: () -> String,
     modifier: Modifier = Modifier
 ) {
     accData ?: return
@@ -309,7 +322,7 @@ fun ShowTapDataInformation(
             .fillMaxWidth()
     ) {
         Text(
-            text = dateToText(accData.date)
+            text = dateToText()
         )
         Row(
             modifier = Modifier,
@@ -338,7 +351,7 @@ fun ShowTapDataInformation(
 
 @Composable
 fun DateList(
-    dateList: MutableList<String>,
+    dateList: List<String>,
     onClickDateTimeElement: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -412,8 +425,7 @@ fun DateTimeRangeChangeButton(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier = modifier,
         horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
         TimeTerm.values().forEach {
@@ -434,66 +446,24 @@ fun DateTimeRangeChangeButton(
     }
 }
 
-@Preview(name = "mdpi", widthDp = 360, heightDp = 640)
-@Preview(name = "hdpi", widthDp = 540, heightDp = 960)
-@Preview(name = "xhdpi", device = Devices.NEXUS_7)
-@Preview(name = "xxhdpi", device = Devices.NEXUS_5)
-@Preview(name = "xxxhdpi", device = Devices.PIXEL_4_XL)
-@Preview(widthDp = 340, heightDp = 560, showBackground = true)
+@MultiDevicePreview
 @Composable
-fun DetailScreenPreview() {
+private fun DetailScreenPreview() {
     val timeManager = TimeManager()
     var accDataList = AccDataList.getAccDataList()
     val dateList = accDataList.groupBy { it.date }.keys.toList()
     val selectDate = dateList.last()
-    var selectTimeTerm: TimeTerm = TimeTerm.Day
-    val xAxisStart = timeManager.dateToEpochTime(accDataList.first().date.withHour(0).withMinute(0).withSecond(0))
-    val xAxisEnd = timeManager.dateToEpochTime(accDataList.last().date.withHour(23).withMinute(59).withSecond(59))
-    accDataList = accDataList.filter {
-        it.date == selectDate
-    }
     RecordAccelTheme {
         Surface(
             color = MaterialTheme.colorScheme.background,
         ) {
-            Column {
-//                DateTimeRangeChangeButton(
-//                    selectTimeTerm = selectTimeTerm,
-//                    onClickTerm = { selectTimeTerm = it },
-//                    modifier = Modifier
-//                        .height(50.dp)
-//                )
-                DateTimeRangeChangeButton(
-                    selectTimeTerm = TimeTerm.Day,
-                    onClickTerm = { },
-                    modifier = Modifier
-                        .height(50.dp),
-                )
-                ShowTapDataInformation(
-                    accData = accDataList.first(),
-                    dateToText = { timeManager.dateToText(it) },
-                    modifier = Modifier
-                        .padding(16.dp)
-                )
-                AccChartView(
-                    accDataList = accDataList.toMutableList(),
-                    minValue = accDataList.minOf { it.resultAcc },
-                    maxValue = accDataList.maxOf { it.resultAcc },
-                    xAxisStart = xAxisStart,
-                    xAxisEnd = xAxisEnd,
-                    convertDateToDate = { 0 },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height((LocalConfiguration.current.screenHeightDp / 3).dp)
-                        .padding(16.dp)
-                        .background(Color.LightGray),
-                )
-//                DateList(
-//                    dateList = dateList.reversed().toMutableList(),
-//                    onClickDateTimeElement = { selectDate = it },
-//                    modifier = Modifier.weight(1f)
-//                )
-            }
+            DetailScreen(
+                uiState = DetailScreenUiState.initialState(),
+                onClickTerm = {},
+                dateToText = {"2020"},
+                convertDateToDate = {0},
+                onClickDateTimeElement = {}
+            )
         }
     }
 }

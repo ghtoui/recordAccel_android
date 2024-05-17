@@ -1,7 +1,6 @@
 package com.moritoui.recordaccel.navigation
 
 import MainScreen
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
@@ -21,7 +20,6 @@ sealed class Screen(
     object DetailScreen : Screen("detailScreen")
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun Navigation(
     modifier: Modifier = Modifier,

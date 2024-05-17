@@ -23,17 +23,32 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class DetailScreenUiState(
-    val accDataList: MutableList<AccData> = mutableListOf(),
-    val minValue: Double = 0.0,
-    val maxValue: Double = 0.0,
-    val selectedDateTime: String? = null,
-    val dateList: MutableList<String> = mutableListOf(),
+    val accDataList: List<AccData>,
+    val minValue: Double,
+    val maxValue: Double,
+    val selectedDateTime: String?,
+    val dateList: List<String>,
     val isLoading: Boolean,
-    val selectTimeTerm: TimeTerm = TimeTerm.Day,
-    val xStart: Long = 0,
-    val xEnd: Long = 0,
-    val selectData: AccData? = null
-)
+    val selectTimeTerm: TimeTerm,
+    val xStart: Long,
+    val xEnd: Long,
+    val selectData: AccData?,
+) {
+    companion object {
+        fun initialState() = DetailScreenUiState(
+            accDataList = emptyList(),
+            minValue = 0.0,
+            maxValue = 0.0,
+            selectedDateTime = null,
+            dateList = emptyList(),
+            isLoading = false,
+            selectTimeTerm= TimeTerm.Day,
+            xStart = 0,
+            xEnd = 0,
+            selectData = null
+        )
+    }
+}
 
 @HiltViewModel
 class DetailScreenViewModel @Inject constructor(
@@ -43,7 +58,7 @@ class DetailScreenViewModel @Inject constructor(
     private val getApiAccelDataUseCase: GetApiAccelDataUseCase,
     getSelectedUserUseCase: GetSelectedUserUseCase,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(DetailScreenUiState(isLoading = true))
+    private val _uiState = MutableStateFlow(DetailScreenUiState.initialState())
     val uiState: StateFlow<DetailScreenUiState> = _uiState.asStateFlow()
     private var isLoadedDateList = false
     private var selectedUser = getSelectedUserUseCase()
@@ -101,7 +116,7 @@ class DetailScreenViewModel @Inject constructor(
     }
 
     // 保存されている加速度の年月日を取得
-    private fun updateDateList(accDataList: MutableList<String>) {
+    private fun updateDateList(accDataList: List<String>) {
         _uiState.update {
             it.copy(
                 dateList = accDataList,
