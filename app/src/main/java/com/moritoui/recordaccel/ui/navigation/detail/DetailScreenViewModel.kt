@@ -1,4 +1,4 @@
-package com.moritoui.recordaccel.viewModel
+package com.moritoui.recordaccel.ui.navigation.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

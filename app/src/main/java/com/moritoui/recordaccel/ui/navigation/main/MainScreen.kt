@@ -1,4 +1,4 @@
-
+package com.moritoui.recordaccel.ui.navigation.main
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -67,7 +67,6 @@ import com.moritoui.recordaccel.model.User
 import com.moritoui.recordaccel.model.UserKind
 import com.moritoui.recordaccel.model.UserList
 import com.moritoui.recordaccel.ui.theme.RecordAccelTheme
-import com.moritoui.recordaccel.viewModel.MainScreenViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)

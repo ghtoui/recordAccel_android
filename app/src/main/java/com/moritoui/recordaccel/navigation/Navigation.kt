@@ -1,6 +1,5 @@
 package com.moritoui.recordaccel.navigation
 
-import MainScreen
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
@@ -11,7 +10,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.moritoui.recordaccel.ui.DetailScreen
+import com.moritoui.recordaccel.ui.navigation.detail.DetailScreen
+import com.moritoui.recordaccel.ui.navigation.main.MainScreen
 
 sealed class Screen(
     val route: String,
