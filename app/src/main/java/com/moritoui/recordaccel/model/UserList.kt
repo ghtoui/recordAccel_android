@@ -7,7 +7,7 @@ object UserList {
         return listOf<User>(
             User(userName = "mori", userId = UUID.randomUUID().toString(), UserKind.Self),
             User(userName = "mori2", userId = UUID.randomUUID().toString(), UserKind.Other),
-            User(userName = "mori3", userId = UUID.randomUUID().toString(), UserKind.Other)
+            User(userName = "mori3", userId = UUID.randomUUID().toString(), UserKind.Other),
         )
     }
 }

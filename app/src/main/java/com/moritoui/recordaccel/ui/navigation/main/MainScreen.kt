@@ -1,4 +1,4 @@
-
+package com.moritoui.recordaccel.ui.navigation.main
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -67,51 +67,50 @@ import com.moritoui.recordaccel.model.User
 import com.moritoui.recordaccel.model.UserKind
 import com.moritoui.recordaccel.model.UserList
 import com.moritoui.recordaccel.ui.theme.RecordAccelTheme
-import com.moritoui.recordaccel.viewModel.MainScreenViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreenTopBar(
     isEdit: Boolean,
-    onEditButtonClick: () -> Unit
+    onEditButtonClick: () -> Unit,
 ) {
     TopAppBar(
         title = {
             Box(
                 modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text("みまもり")
                     Spacer(modifier = Modifier.width(8.dp))
                     Image(
                         painterResource(id = R.drawable.guardian),
-                        contentDescription = null
+                        contentDescription = null,
                     )
                 }
                 IconButton(
                     onClick = { onEditButtonClick() },
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
-                        .padding(end = 8.dp)
+                        .padding(end = 8.dp),
                 ) {
                     when (isEdit) {
                         true -> Icon(
                             Icons.Filled.Check,
-                            contentDescription = null
+                            contentDescription = null,
                         )
 
                         false -> Icon(
                             Icons.Filled.Edit,
-                            contentDescription = null
+                            contentDescription = null,
                         )
                     }
                 }
             }
-        }
+        },
     )
 }
 
@@ -133,19 +132,18 @@ fun MainScreen(
                 isEdit = uiState.isEdit,
                 onEditButtonClick = remember {
                     { viewModel.changeEditState(!uiState.isEdit) }
-                }
+                },
             )
         },
         snackbarHost = {
             SnackbarHost(hostState = snackBarHostState)
-        }
+        },
     ) { innerPadding ->
         Column(
             modifier = modifier
                 .padding(innerPadding)
-                .fillMaxWidth(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             MainUserList(
                 isEdit = uiState.isEdit,
@@ -160,12 +158,12 @@ fun MainScreen(
                 onDeleteButtonClick = remember {
                     { viewModel.deleteUser(it) }
                 },
-                modifier = Modifier.padding(top = 10.dp, bottom = 10.dp)
+                modifier = Modifier.padding(top = 10.dp, bottom = 10.dp),
             )
             UserAddButton(
                 isNotAddSelfUser = uiState.isNotAddSelfUser,
                 addSelfUserButtonClick = viewModel::openSelfUserRegisterDialog,
-                addOtherUserButtonClick = viewModel::openOtherUserRegisterDialog
+                addOtherUserButtonClick = viewModel::openOtherUserRegisterDialog,
             )
         }
         SelfUserRegisterDialog(
@@ -174,7 +172,7 @@ fun MainScreen(
             isRegister = uiState.isRegisterUser,
             textFieldChanged = { viewModel.onChangedSelfNameTextField(it) },
             onConfirmClick = { viewModel.registerUser(isSelf = true) },
-            onDismissClick = viewModel::closeDialog
+            onDismissClick = viewModel::closeDialog,
         )
         OtherUserRegisterDialog(
             isLoading = uiState.isRegisterLoading,
@@ -190,7 +188,7 @@ fun MainScreen(
                 { viewModel.onChangedOtherNameTextField(it) }
             },
             onConfirmClick = { viewModel.registerUser(isSelf = false) },
-            onDismissClick = viewModel::closeDialog
+            onDismissClick = viewModel::closeDialog,
         )
         SelfUserInfoBottomSheet(
             clipBoardManager = LocalClipboardManager.current,
@@ -206,7 +204,7 @@ fun MainScreen(
                 }
             },
             modifier = Modifier
-                .height((LocalConfiguration.current.screenHeightDp / 2).dp)
+                .height((LocalConfiguration.current.screenHeightDp / 2).dp),
         )
     }
 }
@@ -218,16 +216,16 @@ fun MainUserList(
     popUp: (User) -> Unit,
     onIconButtonClick: () -> Unit,
     onDeleteButtonClick: (User) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     LazyColumn(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceAround
+        verticalArrangement = Arrangement.SpaceAround,
     ) {
         items(
             userList,
-            key = { item -> item.uuid }
+            key = { item -> item.uuid },
         ) { user ->
             key(user.uuid) {
                 ListElement(
@@ -238,7 +236,7 @@ fun MainUserList(
                     onDeleteButtonClick = onDeleteButtonClick,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(8.dp)
+                        .padding(8.dp),
                 )
             }
         }
@@ -252,40 +250,40 @@ fun ListElement(
     onElementClick: (User) -> Unit,
     onIconButtonClick: () -> Unit,
     onDeleteButtonClick: (User) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var expanded by remember { mutableStateOf(false) }
     Card(
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 8.dp
+            defaultElevation = 8.dp,
         ),
         modifier = modifier
             .fillMaxWidth()
             .height(100.dp)
-            .clickable { onElementClick(user) }
+            .clickable { onElementClick(user) },
     ) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
                 .align(Alignment.CenterHorizontally),
             horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 user.userName,
                 modifier = Modifier
                     .padding(start = 16.dp, top = 16.dp, bottom = 16.dp, end = 8.dp),
                 textAlign = TextAlign.Center,
-                fontSize = 28.sp
+                fontSize = 28.sp,
             )
             when (user.userKind) {
                 UserKind.Self -> Image(
                     painterResource(id = R.drawable.person),
-                    contentDescription = null
+                    contentDescription = null,
                 )
                 UserKind.Other -> Image(
                     painterResource(id = R.drawable.groups),
-                    contentDescription = null
+                    contentDescription = null,
                 )
             }
             if (user.userKind == UserKind.Self && !isEdit) {
@@ -293,13 +291,13 @@ fun ListElement(
                 IconButton(
                     onClick = { onIconButtonClick() },
                     modifier = Modifier
-                        .padding(end = 8.dp)
+                        .padding(end = 8.dp),
                 ) {
                     Icon(
                         Icons.Default.Info,
                         contentDescription = stringResource(id = R.string.setting_button_description),
                         modifier = Modifier
-                            .aspectRatio(1f / 1f)
+                            .aspectRatio(1f / 1f),
                     )
                 }
             }
@@ -309,11 +307,11 @@ fun ListElement(
                     onClick = {
                         expanded = true
                     },
-                    modifier = Modifier.padding(end = 8.dp)
+                    modifier = Modifier.padding(end = 8.dp),
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.pending),
-                        contentDescription = null
+                        contentDescription = null,
                     )
                     EditDropDownMenu(
                         expanded = expanded,
@@ -323,7 +321,7 @@ fun ListElement(
                                 expanded = false
                                 onDeleteButtonClick(user)
                             }
-                        }
+                        },
                     )
                 }
             }
@@ -336,29 +334,29 @@ fun EditDropDownMenu(
     expanded: Boolean,
     onDismissClick: () -> Unit,
     onDeleteButtonClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = { onDismissClick() },
-        modifier = modifier
+        modifier = modifier,
     ) {
         DropdownMenuItem(
             text = {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(stringResource(R.string.delete_text))
                     Icon(
                         Icons.Filled.Delete,
                         contentDescription = null,
-                        tint = Color.Red
+                        tint = Color.Red,
                     )
                 }
             },
-            onClick = { onDeleteButtonClick() }
+            onClick = { onDeleteButtonClick() },
         )
     }
 }
@@ -371,17 +369,17 @@ fun SelfUserInfoBottomSheet(
     userId: String?,
     onDismissBottomSheet: () -> Unit,
     onCopyButtonClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     if (isOpenBottomSheet && userId != null) {
         ModalBottomSheet(
             onDismissRequest = { onDismissBottomSheet() },
-            modifier = modifier
+            modifier = modifier,
         ) {
             ShowUserId(
                 clipBoardManager = clipBoardManager,
                 userId = userId,
-                onCopyButtonClick = onCopyButtonClick
+                onCopyButtonClick = onCopyButtonClick,
             )
         }
     }
@@ -392,16 +390,16 @@ fun ShowUserId(
     clipBoardManager: ClipboardManager,
     userId: String,
     onCopyButtonClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
-            .padding(start = 16.dp, end = 16.dp)
+            .padding(start = 16.dp, end = 16.dp),
     ) {
         Text(stringResource(R.string.user_id_text))
         Row(
             modifier = Modifier,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(userId)
             Spacer(modifier = Modifier.weight(1f))
@@ -409,11 +407,11 @@ fun ShowUserId(
                 onClick = {
                     clipBoardManager.setText(AnnotatedString(userId))
                     onCopyButtonClick()
-                }
+                },
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.content_copy),
-                    contentDescription = stringResource(R.string.userid_copy_button_description)
+                    contentDescription = stringResource(R.string.userid_copy_button_description),
                 )
             }
         }
@@ -421,7 +419,7 @@ fun ShowUserId(
             color = MaterialTheme.colorScheme.onPrimaryContainer,
             modifier = Modifier
                 .height(1.dp)
-                .fillMaxWidth()
+                .fillMaxWidth(),
         )
     }
 }
@@ -434,7 +432,7 @@ fun SelfUserRegisterDialog(
     textFieldChanged: (String) -> Unit,
     onConfirmClick: () -> Unit,
     onDismissClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     if (isOpenDiagram) {
         AlertDialog(
@@ -448,7 +446,7 @@ fun SelfUserRegisterDialog(
                         ButtonDefaults.buttonColors()
                     } else {
                         ButtonDefaults.outlinedButtonColors()
-                    }
+                    },
                 ) {
                     Text(stringResource(R.string.register_button_text))
                 }
@@ -458,7 +456,7 @@ fun SelfUserRegisterDialog(
                     Text(stringResource(R.string.cancel_button_text))
                 }
             },
-            modifier = modifier
+            modifier = modifier,
         )
     }
 }
@@ -475,7 +473,7 @@ fun OtherUserRegisterDialog(
     nameTextFieldChanged: (String) -> Unit,
     onConfirmClick: () -> Unit,
     onDismissClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     if (isOpenDiagram) {
         AlertDialog(
@@ -485,26 +483,26 @@ fun OtherUserRegisterDialog(
             },
             text = {
                 Box(
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Column(
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
                         TextField(
                             value = idInputText,
                             onValueChange = { idTextFieldChanged(it) },
-                            label = { Text(stringResource(R.string.id_text)) }
+                            label = { Text(stringResource(R.string.id_text)) },
                         )
                         if (isSearchUserError) {
                             Text(
                                 text = stringResource(R.string.other_user_register_error_text),
-                                color = MaterialTheme.colorScheme.error
+                                color = MaterialTheme.colorScheme.error,
                             )
                         }
                         TextField(
                             value = nameInputText,
                             onValueChange = { nameTextFieldChanged(it) },
-                            label = { Text(stringResource(R.string.other_user_name_text)) }
+                            label = { Text(stringResource(R.string.other_user_name_text)) },
                         )
                     }
                     if (isLoading) {
@@ -519,7 +517,7 @@ fun OtherUserRegisterDialog(
                         ButtonDefaults.buttonColors()
                     } else {
                         ButtonDefaults.outlinedButtonColors()
-                    }
+                    },
                 ) {
                     Text(stringResource(R.string.register_button_text))
                 }
@@ -529,7 +527,7 @@ fun OtherUserRegisterDialog(
                     Text(stringResource(R.string.cancel_button_text))
                 }
             },
-            modifier = modifier
+            modifier = modifier,
         )
     }
 }
@@ -539,18 +537,18 @@ fun UserAddButton(
     isNotAddSelfUser: Boolean,
     addSelfUserButtonClick: () -> Unit,
     addOtherUserButtonClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
+        horizontalArrangement = Arrangement.Center,
     ) {
         if (isNotAddSelfUser) {
             Button(
                 onClick = { addSelfUserButtonClick() },
-                modifier = Modifier.padding(end = 15.dp)
+                modifier = Modifier.padding(end = 15.dp),
             ) {
                 Text(stringResource(R.string.user_add_button_text))
             }
@@ -572,12 +570,12 @@ fun MainPreview() {
                 userList = UserList.getUserList(),
                 popUp = { },
                 onIconButtonClick = {},
-                onDeleteButtonClick = {}
+                onDeleteButtonClick = {},
             )
             UserAddButton(
                 isNotAddSelfUser = isNotAddSelfUser,
                 addSelfUserButtonClick = { /*TODO*/ },
-                addOtherUserButtonClick = { /*TODO*/ }
+                addOtherUserButtonClick = { /*TODO*/ },
             )
         }
     }
@@ -589,6 +587,6 @@ fun MenuPreview() {
     EditDropDownMenu(
         expanded = true,
         onDismissClick = { /*TODO*/ },
-        onDeleteButtonClick = { /*TODO*/ }
+        onDeleteButtonClick = { /*TODO*/ },
     )
 }

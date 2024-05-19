@@ -1,5 +1,6 @@
-package com.moritoui.recordaccel.viewModel
+package com.moritoui.recordaccel.ui.navigation.detail
 
+import android.view.MotionEvent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moritoui.recordaccel.model.AccData
@@ -10,9 +11,6 @@ import com.moritoui.recordaccel.usecases.GetAccDateListUseCase
 import com.moritoui.recordaccel.usecases.GetApiAccelDataUseCase
 import com.moritoui.recordaccel.usecases.GetSelectedUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,19 +18,39 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
+import kotlin.math.abs
 
 data class DetailScreenUiState(
-    val accDataList: MutableList<AccData> = mutableListOf(),
-    val minValue: Double = 0.0,
-    val maxValue: Double = 0.0,
-    val selectedDateTime: String? = null,
-    val dateList: MutableList<String> = mutableListOf(),
+    val accDataList: List<AccData>,
+    val minValue: Double,
+    val maxValue: Double,
+    val selectedDateTime: String?,
+    val dateList: List<String>,
     val isLoading: Boolean,
-    val selectTimeTerm: TimeTerm = TimeTerm.Day,
-    val xStart: Long = 0,
-    val xEnd: Long = 0
-)
+    val selectTimeTerm: TimeTerm,
+    val xStart: Long,
+    val xEnd: Long,
+    val selectData: AccData?,
+) {
+    companion object {
+        fun initialState() = DetailScreenUiState(
+            accDataList = emptyList(),
+            minValue = 0.0,
+            maxValue = 0.0,
+            selectedDateTime = null,
+            dateList = emptyList(),
+            isLoading = false,
+            selectTimeTerm = TimeTerm.Day,
+            xStart = 0,
+            xEnd = 0,
+            selectData = null,
+        )
+    }
+}
 
 @HiltViewModel
 class DetailScreenViewModel @Inject constructor(
@@ -42,14 +60,14 @@ class DetailScreenViewModel @Inject constructor(
     private val getApiAccelDataUseCase: GetApiAccelDataUseCase,
     getSelectedUserUseCase: GetSelectedUserUseCase,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(DetailScreenUiState(isLoading = true))
+    private val _uiState = MutableStateFlow(DetailScreenUiState.initialState())
     val uiState: StateFlow<DetailScreenUiState> = _uiState.asStateFlow()
     private var isLoadedDateList = false
     private var selectedUser = getSelectedUserUseCase()
     private var accDataList: MutableList<AccData> = getAccDataListUseCase(userKind = selectedUser?.userKind, selectedDate = _uiState.value.selectedDateTime)
 
     init {
-        updateXAxis()
+        updateAxis()
         // 1秒毎に加速度を収集する
         viewModelScope.launch {
             while (true) {
@@ -62,7 +80,7 @@ class DetailScreenViewModel @Inject constructor(
                     val getAsyncDateList = async {
                         getDateListUseCase(
                             pageNumber = 0,
-                            dateList = _uiState.value.dateList
+                            dateList = _uiState.value.dateList,
                         )
                     }
                     val accDateList = getAsyncDateList.await()
@@ -100,20 +118,23 @@ class DetailScreenViewModel @Inject constructor(
     }
 
     // 保存されている加速度の年月日を取得
-    private fun updateDateList(accDataList: MutableList<String>) {
+    private fun updateDateList(accDataList: List<String>) {
         _uiState.update {
             it.copy(
-                dateList = accDataList
+                dateList = accDataList,
             )
         }
     }
 
     // 加速度データから選択されている年月日だけのものを抜き出す
     private fun accDataDateFilter(accDataList: List<AccData>): List<AccData> {
+        val xStart = _uiState.value.xStart
+        val xEnd = _uiState.value.xEnd
         return when (_uiState.value.selectedDateTime) {
             null -> accDataList
             else -> accDataList.filter {
-                it.date.format(DateTimeFormatter.ISO_LOCAL_DATE) == _uiState.value.selectedDateTime
+                it.date.format(DateTimeFormatter.ISO_LOCAL_DATE) == _uiState.value.selectedDateTime &&
+                    convertDateToTime(it.date) in (xStart + 1) until xEnd
             }
         }
     }
@@ -121,13 +142,13 @@ class DetailScreenViewModel @Inject constructor(
     // 要素が選択された時に呼び出すものをまとめる
     private fun selectReload() {
         updateIsLoading(true)
-        updateXAxis()
+        updateAxis()
     }
 
     private fun updateIsLoading(isLoading: Boolean) {
         _uiState.update {
             it.copy(
-                isLoading = isLoading
+                isLoading = isLoading,
             )
         }
     }
@@ -172,12 +193,13 @@ class DetailScreenViewModel @Inject constructor(
         return Pair(start, end)
     }
 
-    private fun updateXAxis() {
+    private fun updateAxis() {
         val xAxis = calcXAxis()
+
         _uiState.update {
             it.copy(
                 xStart = xAxis.first,
-                xEnd = xAxis.second
+                xEnd = xAxis.second,
             )
         }
     }
@@ -190,7 +212,7 @@ class DetailScreenViewModel @Inject constructor(
                 selectedDateTime = selectedDateTime,
                 minValue = 0.0,
                 maxValue = 0.0,
-                selectTimeTerm = TimeTerm.Day
+                selectTimeTerm = TimeTerm.Day,
             )
         }
         viewModelScope.launch {
@@ -203,9 +225,61 @@ class DetailScreenViewModel @Inject constructor(
     fun selectTimeTerm(selectTimeTerm: TimeTerm) {
         _uiState.update {
             it.copy(
-                selectTimeTerm = selectTimeTerm
+                selectTimeTerm = selectTimeTerm,
             )
         }
         selectReload()
+    }
+
+    fun getDateLabelText(): String {
+        val selectAccData = _uiState.value.selectData
+        return if (selectAccData != null) {
+            timeManager.dateToText(selectAccData.date)
+        } else {
+            ""
+        }
+    }
+
+    fun convertDateToTime(dateTime: LocalDateTime): Long {
+        return timeManager.dateToEpochTime(dateTime)
+    }
+
+    fun onClickGraph(height: Float, width: Float, event: MotionEvent?) {
+        val MAX_DISTANCE = 4000000
+
+        if (event == null) {
+            _uiState.update {
+                it.copy(selectData = null)
+            }
+            return
+        }
+        val start = _uiState.value.xStart
+        val end = _uiState.value.xEnd
+
+        val timeRange = end - start
+        val timeOffset = event.x * timeRange / width
+        val time = timeOffset + start
+
+        val minValue = _uiState.value.minValue
+        val maxValue = _uiState.value.maxValue
+
+        val valueRange = maxValue - minValue
+        val valueOffset = event.y * valueRange / height
+        val value = maxValue - valueOffset
+
+        // 選択されている箇所の近くのみのリストにする
+        val filteredList = _uiState.value.accDataList.filter {
+            abs(it.resultAcc - value) < 0.2 && abs(convertDateToTime(it.date) - time) < MAX_DISTANCE
+        }
+
+        val selected = filteredList.minByOrNull {
+            abs(convertDateToTime(it.date) - time)
+        }
+
+        _uiState.update {
+            it.copy(
+                selectData = selected,
+            )
+        }
     }
 }

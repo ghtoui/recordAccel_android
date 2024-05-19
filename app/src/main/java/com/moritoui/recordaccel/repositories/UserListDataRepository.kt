@@ -23,7 +23,7 @@ interface UserListDataRepository {
 
 class UserListDataRepositoryImpl @Inject constructor(
     private val userListDataStore: DataStore<Preferences>,
-    private val jsonAdapter: JsonAdapter<MutableList<User>>
+    private val jsonAdapter: JsonAdapter<MutableList<User>>,
 ) : UserListDataRepository {
     private val USER_LIST = "user_list"
     private val _userList = MutableStateFlow<MutableList<User>>(mutableListOf())

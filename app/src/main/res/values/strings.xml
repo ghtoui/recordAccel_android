@@ -13,4 +13,7 @@
     <string name="userid_copy_button_description">ユーザーIDコピーボタン</string>
     <string name="user_id_text">ユーザーID</string>
     <string name="delete_text">削除</string>
+    <string name="date_change_buttontext">%1$s時間</string>
+    <string name="move_graph_label_text">動いた</string>
+    <string name="unmove_graph_label_text">動かなかった</string>
 </resources>

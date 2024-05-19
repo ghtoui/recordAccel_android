@@ -14,7 +14,7 @@ class MainApplication : Application() {
         val notificationChannel = NotificationChannel(
             BuildConfig.FOREGROUND_SENSOR_CHANNEL_NAME,
             "Sensor Service Channel",
-            NotificationManager.IMPORTANCE_HIGH
+            NotificationManager.IMPORTANCE_HIGH,
         )
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(notificationChannel)

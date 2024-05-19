@@ -1,10 +1,12 @@
 package com.moritoui.recordaccel.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 
 private val LightColors = lightColorScheme(
     primary = md_theme_light_primary,
@@ -69,10 +71,11 @@ private val DarkColors = darkColorScheme(
     outlineVariant = md_theme_dark_outlineVariant,
     scrim = md_theme_dark_scrim,
 )
+
 @Composable
 fun RecordAccelTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable() () -> Unit
+    content: @Composable() () -> Unit,
 ) {
     val colors = if (!useDarkTheme) {
         LightColors
@@ -82,6 +85,17 @@ fun RecordAccelTheme(
 
     MaterialTheme(
         colorScheme = colors,
-        content = content
+        content = content,
     )
+}
+
+object RecordAccelTheme {
+    val colors: ColorScheme
+        @Composable
+        @ReadOnlyComposable
+        get() = if (isSystemInDarkTheme()) {
+            LightColors
+        } else {
+            DarkColors
+        }
 }
