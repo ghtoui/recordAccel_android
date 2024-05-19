@@ -56,7 +56,7 @@ fun DetailScreen(
         dateToText = viewModel::getDateLabelText,
         convertDateToDate = viewModel::convertDateToTime,
         onClickDateTimeElement = viewModel::updateSelectedDatetime,
-        onClickGraph = viewModel::onClickGraph
+        onClickGraph = viewModel::onClickGraph,
     )
 }
 
@@ -67,18 +67,18 @@ private fun DetailScreen(
     dateToText: () -> String,
     convertDateToDate: (LocalDateTime) -> Long,
     onClickGraph: (Float, Float, MotionEvent?) -> Unit,
-    onClickDateTimeElement: (String) -> Unit
+    onClickDateTimeElement: (String) -> Unit,
 ) {
     Column {
         DateTimeRangeChangeButton(
             selectTimeTerm = uiState.selectTimeTerm,
-            onClickTerm = onClickTerm
+            onClickTerm = onClickTerm,
         )
         ShowTapDataInformation(
             accData = uiState.selectData,
             dateToText = dateToText,
             modifier = Modifier
-                .padding(16.dp)
+                .padding(16.dp),
         )
         Box(
             modifier = Modifier
@@ -125,21 +125,21 @@ fun ShowTapDataInformation(
     if (accData == null) {
         Spacer(
             modifier = modifier
-            .height(50.dp)
+                .height(50.dp),
         )
         return
     }
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .height(50.dp)
+            .height(50.dp),
     ) {
         Text(
-            text = dateToText()
+            text = dateToText(),
         )
         Row(
             modifier = Modifier,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(
                 modifier = Modifier
@@ -148,7 +148,7 @@ fun ShowTapDataInformation(
                         color = when (accData.isMove) {
                             true -> Color.Black
                             false -> Color.Red
-                        }
+                        },
                     ),
             )
             Spacer(modifier = Modifier.width(8.dp))
@@ -156,7 +156,7 @@ fun ShowTapDataInformation(
                 when (accData.isMove) {
                     true -> stringResource(id = R.string.move_graph_label_text)
                     false -> stringResource(id = R.string.unmove_graph_label_text)
-                }
+                },
             )
         }
     }
@@ -241,8 +241,8 @@ private fun DetailScreenPreview() {
             DetailScreen(
                 uiState = DetailScreenUiState.initialState(),
                 onClickTerm = {},
-                dateToText = {"2020"},
-                convertDateToDate = {0},
+                dateToText = { "2020" },
+                convertDateToDate = { 0 },
                 onClickDateTimeElement = {},
                 onClickGraph = { _, _, _ -> },
             )

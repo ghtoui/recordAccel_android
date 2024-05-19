@@ -68,7 +68,7 @@ fun AccChartView(
     var height by rememberSaveable { mutableFloatStateOf(0.0.toFloat()) }
 
     Box(
-        modifier = modifier
+        modifier = modifier,
     ) {
         val selectedPointColor = RecordAccelTheme.colors.primary
         Canvas(
@@ -237,7 +237,7 @@ private fun AccDataChartViewPreview() {
                 xAxisStart = 0,
                 xAxisEnd = 1,
                 convertDateToDate = { 0 },
-                onClickGraph = { _, _, _, ->},
+                onClickGraph = { _, _, _ -> },
                 selectedData = DetailScreenDummies.accDataList.first(),
                 modifier = Modifier
                     .fillMaxSize()

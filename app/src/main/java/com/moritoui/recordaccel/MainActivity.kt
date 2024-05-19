@@ -56,9 +56,9 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier
                             .windowInsetsPadding(
                                 WindowInsets.safeDrawing.only(
-                                    WindowInsetsSides.Top
-                                )
-                            )
+                                    WindowInsetsSides.Top,
+                                ),
+                            ),
                     )
                 }
             }

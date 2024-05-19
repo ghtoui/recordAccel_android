@@ -98,5 +98,4 @@ object RecordAccelTheme {
         } else {
             DarkColors
         }
-
 }

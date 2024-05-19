@@ -11,9 +11,6 @@ import com.moritoui.recordaccel.usecases.GetAccDateListUseCase
 import com.moritoui.recordaccel.usecases.GetApiAccelDataUseCase
 import com.moritoui.recordaccel.usecases.GetSelectedUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +18,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import kotlin.math.abs
 
@@ -44,10 +44,10 @@ data class DetailScreenUiState(
             selectedDateTime = null,
             dateList = emptyList(),
             isLoading = false,
-            selectTimeTerm= TimeTerm.Day,
+            selectTimeTerm = TimeTerm.Day,
             xStart = 0,
             xEnd = 0,
-            selectData = null
+            selectData = null,
         )
     }
 }
@@ -134,7 +134,7 @@ class DetailScreenViewModel @Inject constructor(
             null -> accDataList
             else -> accDataList.filter {
                 it.date.format(DateTimeFormatter.ISO_LOCAL_DATE) == _uiState.value.selectedDateTime &&
-                        convertDateToTime(it.date) in (xStart + 1) until xEnd
+                    convertDateToTime(it.date) in (xStart + 1) until xEnd
             }
         }
     }
@@ -278,7 +278,7 @@ class DetailScreenViewModel @Inject constructor(
 
         _uiState.update {
             it.copy(
-                selectData = selected
+                selectData = selected,
             )
         }
     }
