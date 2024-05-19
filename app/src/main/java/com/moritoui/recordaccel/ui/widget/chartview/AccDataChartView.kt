@@ -1,7 +1,6 @@
 package com.moritoui.recordaccel.ui.widget.chartview
 
 import android.graphics.PointF
-import android.util.Log
 import android.view.MotionEvent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -19,6 +18,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -47,6 +50,8 @@ fun AccChartView(
     xAxisStart: Long,
     xAxisEnd: Long,
     convertDateToDate: (LocalDateTime) -> Long,
+    onClickGraph: (Float, Float, MotionEvent?) -> Unit,
+    selectedData: AccData?,
     modifier: Modifier = Modifier,
 ) {
     if (accDataList.isEmpty()) {
@@ -54,37 +59,42 @@ fun AccChartView(
     }
     val points: MutableList<Offset> = mutableListOf()
     val zeroPoints: MutableList<Offset> = mutableListOf()
+    val selectedPoints: MutableList<Offset> = mutableListOf()
 
     val textMeasurer = rememberTextMeasurer()
     val pointSize = 30.toFloat()
 
+    var width by rememberSaveable { mutableFloatStateOf(0.0.toFloat()) }
+    var height by rememberSaveable { mutableFloatStateOf(0.0.toFloat()) }
+
     Box(
-        modifier = modifier,
+        modifier = modifier
     ) {
+        val selectedPointColor = RecordAccelTheme.colors.primary
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
                 .pointerInteropFilter { motionEvent: MotionEvent ->
                     when (motionEvent.action) {
                         MotionEvent.ACTION_DOWN -> {
-                            Log.d("action", "tap")
-                            Log.d("tap", "${motionEvent.x}, ${motionEvent.y}")
+                            onClickGraph(height, width, motionEvent)
                         }
 
                         MotionEvent.ACTION_MOVE -> {
-                            Log.d("action", "move")
-                            Log.d("move", "${motionEvent.x}, ${motionEvent.y}")
+                            onClickGraph(height, width, motionEvent)
                         }
 
-                        MotionEvent.ACTION_UP -> {
-                            Log.d("action", "up")
+                        else -> {
+                            onClickGraph(height, width, null)
+                            return@pointerInteropFilter false
                         }
-
-                        else -> return@pointerInteropFilter false
                     }
                     true
                 },
         ) {
+            width = size.width
+            height = size.height
+
             val resultAccPath = Path()
             accDataList.forEachIndexed { index, accData ->
                 val resultAccPathXY = getChartPath(
@@ -99,8 +109,11 @@ fun AccChartView(
                 )
 
                 when (accData.isMove) {
-                    true -> zeroPoints.add(Offset(resultAccPathXY.x, resultAccPathXY.y))
-                    false -> points.add(Offset(resultAccPathXY.x, resultAccPathXY.y))
+                    true -> points.add(Offset(resultAccPathXY.x, resultAccPathXY.y))
+                    false -> zeroPoints.add(Offset(resultAccPathXY.x, resultAccPathXY.y))
+                }
+                if (accData == selectedData) {
+                    selectedPoints.add(Offset(resultAccPathXY.x, resultAccPathXY.y))
                 }
                 when (index) {
                     0 -> {
@@ -112,13 +125,6 @@ fun AccChartView(
                     }
                 }
             }
-            //        drawText(
-            //            topLeft = Offset(size.width, size.height),
-            //            topLeft = Offset(600.toFloat(), size.height - 40),
-            //            style = TextStyle.Default,
-            //            textMeasurer = textMeasurer,
-            //            text = "aaaaaaaaaa"
-            //        )
 
             drawPoints(
                 points = points,
@@ -132,11 +138,12 @@ fun AccChartView(
                 color = Color.Red,
                 strokeWidth = pointSize,
             )
-            //        drawPath(
-            //            path = resultAccPath,
-            //            color = Color.Black,
-            //            style = Stroke(8f)
-            //        )
+            drawPoints(
+                points = selectedPoints,
+                pointMode = PointMode.Points,
+                color = selectedPointColor,
+                strokeWidth = pointSize,
+            )
         }
 
         DrawLabel(
@@ -201,17 +208,15 @@ private fun getChartPath(
     xAxisStart: Long,
     xAxisEnd: Long,
 ): PointF {
-    val width = canvasWidthSize
-    val height = canvasHeightSize
     val timeRange = xAxisEnd - xAxisStart
     val timeOffset = time - xAxisStart
     val valueRange = maxValue - minValue
     val valueOffset = maxValue - value
 
-    val x = width * timeOffset / timeRange
-    var y = height * valueOffset / valueRange
+    val x = canvasWidthSize * timeOffset / timeRange
+    var y = canvasHeightSize * valueOffset / valueRange
     if (y.isNaN()) {
-        y = height * value
+        y = canvasHeightSize * value
     }
 
     return PointF(x, y.toFloat())
@@ -232,6 +237,8 @@ private fun AccDataChartViewPreview() {
                 xAxisStart = 0,
                 xAxisEnd = 1,
                 convertDateToDate = { 0 },
+                onClickGraph = { _, _, _, ->},
+                selectedData = DetailScreenDummies.accDataList.first(),
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(8.dp),

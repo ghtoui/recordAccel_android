@@ -1,5 +1,6 @@
 package com.moritoui.recordaccel.ui.navigation.detail
 
+import android.view.MotionEvent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moritoui.recordaccel.model.AccData
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.abs
 
 data class DetailScreenUiState(
     val accDataList: List<AccData>,
@@ -65,7 +67,7 @@ class DetailScreenViewModel @Inject constructor(
     private var accDataList: MutableList<AccData> = getAccDataListUseCase(userKind = selectedUser?.userKind, selectedDate = _uiState.value.selectedDateTime)
 
     init {
-        updateXAxis()
+        updateAxis()
         // 1秒毎に加速度を収集する
         viewModelScope.launch {
             while (true) {
@@ -126,10 +128,13 @@ class DetailScreenViewModel @Inject constructor(
 
     // 加速度データから選択されている年月日だけのものを抜き出す
     private fun accDataDateFilter(accDataList: List<AccData>): List<AccData> {
+        val xStart = _uiState.value.xStart
+        val xEnd = _uiState.value.xEnd
         return when (_uiState.value.selectedDateTime) {
             null -> accDataList
             else -> accDataList.filter {
-                it.date.format(DateTimeFormatter.ISO_LOCAL_DATE) == _uiState.value.selectedDateTime
+                it.date.format(DateTimeFormatter.ISO_LOCAL_DATE) == _uiState.value.selectedDateTime &&
+                        convertDateToTime(it.date) in (xStart + 1) until xEnd
             }
         }
     }
@@ -137,7 +142,7 @@ class DetailScreenViewModel @Inject constructor(
     // 要素が選択された時に呼び出すものをまとめる
     private fun selectReload() {
         updateIsLoading(true)
-        updateXAxis()
+        updateAxis()
     }
 
     private fun updateIsLoading(isLoading: Boolean) {
@@ -188,8 +193,9 @@ class DetailScreenViewModel @Inject constructor(
         return Pair(start, end)
     }
 
-    private fun updateXAxis() {
+    private fun updateAxis() {
         val xAxis = calcXAxis()
+
         _uiState.update {
             it.copy(
                 xStart = xAxis.first,
@@ -236,5 +242,44 @@ class DetailScreenViewModel @Inject constructor(
 
     fun convertDateToTime(dateTime: LocalDateTime): Long {
         return timeManager.dateToEpochTime(dateTime)
+    }
+
+    fun onClickGraph(height: Float, width: Float, event: MotionEvent?) {
+        val MAX_DISTANCE = 4000000
+
+        if (event == null) {
+            _uiState.update {
+                it.copy(selectData = null)
+            }
+            return
+        }
+        val start = _uiState.value.xStart
+        val end = _uiState.value.xEnd
+
+        val timeRange = end - start
+        val timeOffset = event.x * timeRange / width
+        val time = timeOffset + start
+
+        val minValue = _uiState.value.minValue
+        val maxValue = _uiState.value.maxValue
+
+        val valueRange = maxValue - minValue
+        val valueOffset = event.y * valueRange / height
+        val value = maxValue - valueOffset
+
+        // 選択されている箇所の近くのみのリストにする
+        val filteredList = _uiState.value.accDataList.filter {
+            abs(it.resultAcc - value) < 0.2 && abs(convertDateToTime(it.date) - time) < MAX_DISTANCE
+        }
+
+        val selected = filteredList.minByOrNull {
+            abs(convertDateToTime(it.date) - time)
+        }
+
+        _uiState.update {
+            it.copy(
+                selectData = selected
+            )
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.moritoui.recordaccel.ui.navigation.detail
 
+import android.view.MotionEvent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -54,7 +55,8 @@ fun DetailScreen(
         onClickTerm = viewModel::selectTimeTerm,
         dateToText = viewModel::getDateLabelText,
         convertDateToDate = viewModel::convertDateToTime,
-        onClickDateTimeElement = viewModel::updateSelectedDatetime
+        onClickDateTimeElement = viewModel::updateSelectedDatetime,
+        onClickGraph = viewModel::onClickGraph
     )
 }
 
@@ -64,6 +66,7 @@ private fun DetailScreen(
     onClickTerm: (TimeTerm) -> Unit,
     dateToText: () -> String,
     convertDateToDate: (LocalDateTime) -> Long,
+    onClickGraph: (Float, Float, MotionEvent?) -> Unit,
     onClickDateTimeElement: (String) -> Unit
 ) {
     Column {
@@ -89,6 +92,8 @@ private fun DetailScreen(
                 xAxisStart = uiState.xStart,
                 xAxisEnd = uiState.xEnd,
                 convertDateToDate = convertDateToDate,
+                onClickGraph = onClickGraph,
+                selectedData = uiState.selectData,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(8.dp),
@@ -117,10 +122,17 @@ fun ShowTapDataInformation(
     accData: AccData?,
     dateToText: () -> String,
 ) {
-    accData ?: return
+    if (accData == null) {
+        Spacer(
+            modifier = modifier
+            .height(50.dp)
+        )
+        return
+    }
     Column(
         modifier = modifier
             .fillMaxWidth()
+            .height(50.dp)
     ) {
         Text(
             text = dateToText()
@@ -231,7 +243,8 @@ private fun DetailScreenPreview() {
                 onClickTerm = {},
                 dateToText = {"2020"},
                 convertDateToDate = {0},
-                onClickDateTimeElement = {}
+                onClickDateTimeElement = {},
+                onClickGraph = { _, _, _ -> },
             )
         }
     }
