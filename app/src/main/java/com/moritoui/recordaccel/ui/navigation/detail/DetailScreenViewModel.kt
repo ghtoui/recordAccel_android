@@ -11,6 +11,9 @@ import com.moritoui.recordaccel.usecases.GetAccDateListUseCase
 import com.moritoui.recordaccel.usecases.GetApiAccelDataUseCase
 import com.moritoui.recordaccel.usecases.GetSelectedUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,9 +21,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import kotlin.math.abs
 
@@ -269,7 +269,7 @@ class DetailScreenViewModel @Inject constructor(
 
         // 選択されている箇所の近くのみのリストにする
         val filteredList = _uiState.value.accDataList.filter {
-            abs(it.resultAcc - value) < 0.2 && abs(convertDateToTime(it.date) - time) < MAX_DISTANCE
+            abs(it.resultAcc - value) < 0.05 && abs(convertDateToTime(it.date) - time) < MAX_DISTANCE
         }
 
         val selected = filteredList.minByOrNull {
