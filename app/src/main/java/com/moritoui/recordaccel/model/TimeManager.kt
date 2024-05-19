@@ -10,6 +10,10 @@ class TimeManager {
         return LocalDateTime.parse(dateText, customDateFormatter)
     }
 
+    fun dateToText(datetime: LocalDateTime): String {
+        return datetime.format(customDateFormatter)
+    }
+
     fun dateToISOText(datetime: LocalDateTime): String {
         return "${datetime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)}Z"
     }
