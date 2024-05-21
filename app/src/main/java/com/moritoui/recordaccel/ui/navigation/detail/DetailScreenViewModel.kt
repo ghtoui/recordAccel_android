@@ -269,7 +269,7 @@ class DetailScreenViewModel @Inject constructor(
 
         // 選択されている箇所の近くのみのリストにする
         val filteredList = _uiState.value.accDataList.filter {
-            abs(it.resultAcc - value) < 0.2 && abs(convertDateToTime(it.date) - time) < MAX_DISTANCE
+            abs(it.resultAcc - value) < 0.05 && abs(convertDateToTime(it.date) - time) < MAX_DISTANCE
         }
 
         val selected = filteredList.minByOrNull {
