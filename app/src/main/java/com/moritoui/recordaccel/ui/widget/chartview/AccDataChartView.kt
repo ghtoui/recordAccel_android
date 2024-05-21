@@ -85,7 +85,6 @@ fun AccChartView(
                         }
 
                         else -> {
-                            onClickGraph(height, width, null)
                             return@pointerInteropFilter false
                         }
                     }
