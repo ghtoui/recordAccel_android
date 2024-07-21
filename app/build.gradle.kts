@@ -11,12 +11,12 @@ plugins {
 
 android {
     namespace = "com.moritoui.recordaccel"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.moritoui.recordaccel"
         minSdk = 29
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 5
         versionName = "5.0"
 
